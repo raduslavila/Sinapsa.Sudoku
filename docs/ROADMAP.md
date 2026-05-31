@@ -51,23 +51,26 @@
 - ✅ Timer.
 - ✅ Mistake counter.
 
-## Milestone 4.1 — Bug Fixes & UX Refinements
+## ✅ Milestone 4.1 — Bug Fixes & UX Refinements
 
-- Notes toggle on/off fix.
-- Conflict-aware note digit coloring (red for digits already in peers).
-- Control panel and banners horizontal alignment fix.
-- Grid overflow fix (grid no longer exceeds container width).
-- Split Hint into Hint (highlight cell) and Hint+ (highlight + place digit).
-- `hintedIndex` tracked in game state; cleared on any player action.
-- Ad placeholder strip at bottom of game screen.
+- ✅ Notes toggle on/off fix.
+- ✅ Conflict-aware note digit coloring (red for digits already in peers).
+- ✅ Control panel and banners horizontal alignment fix.
+- ✅ Grid overflow fix (grid no longer exceeds container width).
+- ✅ Split Hint into Hint (highlight cell) and Hint+ (highlight + place digit).
+- ✅ `hintedIndex` tracked in game state; cleared on any player action.
+- ✅ Ad placeholder strip at bottom of game screen.
+- ✅ Smart 4-tier hint algorithm (Full House → Naked Single → Hidden Single → MRV Fallback).
 
-## Milestone 5 — Persistence
+## ✅ Milestone 5 — Persistence
 
-- IndexedDB repository.
-- Schema validation.
-- Migrations.
-- Auto-save.
-- Continue game.
+- ✅ IndexedDB repository (`src/storage/indexedDbRepository.ts`).
+- ✅ Zod schema validation for all persisted records (`src/storage/schemas.ts`).
+- ✅ Schema versioning and migrations infrastructure (`src/storage/migrations.ts`).
+- ✅ Auto-save on every board-changing move.
+- ✅ Completed game summary saved on win/over; active save deleted.
+- ✅ Continue game on app launch (`loadActiveGame` in App.tsx).
+- ✅ Repository serialization tests (24 tests).
 
 ## Milestone 6 — Statistics and settings
 

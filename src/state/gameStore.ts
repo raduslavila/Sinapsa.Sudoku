@@ -20,10 +20,31 @@ import {
     applyHint as applyHintAction,
     getElapsedMs as getElapsedMsAction,
 } from './gameState.ts';
+import {
+    saveActiveGame,
+    deleteActiveGame,
+    saveCompletedGame,
+} from '../storage/index.ts';
+
+// ---------------------------------------------------------------------------
+// Persistence helper
+// ---------------------------------------------------------------------------
+
+/** Persists `next` state after a mutation. Fire-and-forget. */
+function persistAfterMove(next: GameState): void {
+    if (next.status === 'won' || next.status === 'over') {
+        void saveCompletedGame(next);
+        void deleteActiveGame();
+    } else {
+        void saveActiveGame(next);
+    }
+}
 
 interface GameStore {
     game: GameState;
     startGame: (difficultyId: DifficultyId) => void;
+    /** Load a previously saved game and resume playing. */
+    continueGame: (savedState: GameState) => void;
     goHome: () => void;
     selectCell: (index: number) => void;
     /** Routes to placeDigit or toggleNote depending on notesMode. */
@@ -46,10 +67,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const seed = nanoid();
         const config = getDifficultyConfig(difficultyId);
         const puzzle = generatePuzzle(seed, difficultyId);
-        set({ game: createGame(puzzle, config.defaultMistakeLimit, Date.now()) });
+        const next = createGame(puzzle, config.defaultMistakeLimit, Date.now());
+        set({ game: next });
+        void saveActiveGame(next);
+    },
+
+    continueGame: (savedState) => {
+        set({ game: savedState });
     },
 
     goHome: () => {
+        const current = get().game;
+        if (current.status === 'playing' || current.status === 'paused') {
+            void saveActiveGame(current);
+        }
         set({ game: IDLE_STATE });
     },
 
@@ -58,15 +89,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     },
 
     handleDigitInput: (digit) => {
-        set((s) => ({
-            game: s.game.notesMode
+        set((s) => {
+            const next = s.game.notesMode
                 ? toggleNoteAction(s.game, digit)
-                : placeDigitAction(s.game, digit),
-        }));
+                : placeDigitAction(s.game, digit);
+            persistAfterMove(next);
+            return { game: next };
+        });
     },
 
     clearCell: () => {
-        set((s) => ({ game: clearCellAction(s.game) }));
+        set((s) => {
+            const next = clearCellAction(s.game);
+            if (next !== s.game) void saveActiveGame(next);
+            return { game: next };
+        });
     },
 
     setNotesMode: (enabled) => {
@@ -74,15 +111,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     },
 
     undo: () => {
-        set((s) => ({ game: undoAction(s.game) }));
+        set((s) => {
+            const next = undoAction(s.game);
+            if (next !== s.game) void saveActiveGame(next);
+            return { game: next };
+        });
     },
 
     redo: () => {
-        set((s) => ({ game: redoAction(s.game) }));
+        set((s) => {
+            const next = redoAction(s.game);
+            if (next !== s.game) void saveActiveGame(next);
+            return { game: next };
+        });
     },
 
     pause: () => {
-        set((s) => ({ game: pauseAction(s.game, Date.now()) }));
+        set((s) => {
+            const next = pauseAction(s.game, Date.now());
+            void saveActiveGame(next);
+            return { game: next };
+        });
     },
 
     resume: () => {
@@ -94,7 +143,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     },
 
     applyHint: () => {
-        set((s) => ({ game: applyHintAction(s.game) }));
+        set((s) => {
+            const next = applyHintAction(s.game);
+            persistAfterMove(next);
+            return { game: next };
+        });
     },
 
     getElapsedMs: () => getElapsedMsAction(get().game, Date.now()),
