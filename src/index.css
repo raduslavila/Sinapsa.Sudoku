@@ -1,0 +1,103 @@
+:root {
+  --color-bg: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-border: #c8c8c8;
+  --color-primary: #1a6fc4;
+  --color-primary-hover: #1559a0;
+  --color-given: #1a1a2e;
+  --color-user: #1a6fc4;
+  --color-wrong: #c42b2b;
+  --color-hint: #2b7a45;
+  --color-selected: #bbd8f7;
+  --color-peer: #deeaf9;
+  --color-conflict: #f7d0d0;
+  --color-note: #555;
+  --color-btn-bg: #e8e8e8;
+  --color-btn-hover: #d4d4d4;
+
+  /* (100vw - container padding 16px) / 9 cells, clamped 36-52px */
+  --cell-size: clamp(36px, calc((min(100vw, 480px) - 16px) / 9), 52px);
+
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  color: var(--color-given);
+  background-color: var(--color-bg);
+}
+
+/* System dark mode (no explicit data-theme set) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #121212;
+    --color-surface: #1e1e1e;
+    --color-border: #3a3a3a;
+    --color-primary: #5b9fef;
+    --color-primary-hover: #4a8ede;
+    --color-given: #e8e8e8;
+    --color-user: #5b9fef;
+    --color-wrong: #ef5b5b;
+    --color-hint: #4ecf7a;
+    --color-selected: #1e3a5f;
+    --color-peer: #1a2e40;
+    --color-conflict: #4a1a1a;
+    --color-note: #aaa;
+    --color-btn-bg: #2a2a2a;
+    --color-btn-hover: #3a3a3a;
+  }
+}
+
+/* Explicit dark mode */
+[data-theme="dark"] {
+  --color-bg: #121212;
+  --color-surface: #1e1e1e;
+  --color-border: #3a3a3a;
+  --color-primary: #5b9fef;
+  --color-primary-hover: #4a8ede;
+  --color-given: #e8e8e8;
+  --color-user: #5b9fef;
+  --color-wrong: #ef5b5b;
+  --color-hint: #4ecf7a;
+  --color-selected: #1e3a5f;
+  --color-peer: #1a2e40;
+  --color-conflict: #4a1a1a;
+  --color-note: #aaa;
+  --color-btn-bg: #2a2a2a;
+  --color-btn-hover: #3a3a3a;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-bg);
+}
+
+#root {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
