@@ -24,6 +24,46 @@
   background-color: var(--color-bg);
 }
 
+/* System dark mode (no explicit data-theme set) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #121212;
+    --color-surface: #1e1e1e;
+    --color-border: #3a3a3a;
+    --color-primary: #5b9fef;
+    --color-primary-hover: #4a8ede;
+    --color-given: #e8e8e8;
+    --color-user: #5b9fef;
+    --color-wrong: #ef5b5b;
+    --color-hint: #4ecf7a;
+    --color-selected: #1e3a5f;
+    --color-peer: #1a2e40;
+    --color-conflict: #4a1a1a;
+    --color-note: #aaa;
+    --color-btn-bg: #2a2a2a;
+    --color-btn-hover: #3a3a3a;
+  }
+}
+
+/* Explicit dark mode */
+[data-theme="dark"] {
+  --color-bg: #121212;
+  --color-surface: #1e1e1e;
+  --color-border: #3a3a3a;
+  --color-primary: #5b9fef;
+  --color-primary-hover: #4a8ede;
+  --color-given: #e8e8e8;
+  --color-user: #5b9fef;
+  --color-wrong: #ef5b5b;
+  --color-hint: #4ecf7a;
+  --color-selected: #1e3a5f;
+  --color-peer: #1a2e40;
+  --color-conflict: #4a1a1a;
+  --color-note: #aaa;
+  --color-btn-bg: #2a2a2a;
+  --color-btn-hover: #3a3a3a;
+}
+
 *,
 *::before,
 *::after {

@@ -39,6 +39,9 @@ export const persistedGameSchema = z.object({
 
     undoStack: z.array(snapshotSchema).readonly(),
     redoStack: z.array(snapshotSchema).readonly(),
+
+    hintsUsed: z.number().int().min(0).optional(),
+    hintLimit: z.number().int().positive().nullable().optional(),
 });
 
 export const persistedCompletedGameSchema = z.object({
@@ -55,3 +58,11 @@ export const persistedCompletedGameSchema = z.object({
 
 // Re-export CellValue schema for external use if needed
 export { cellValueSchema };
+
+export const settingsSchema = z.object({
+    schemaVersion: z.number().int().positive(),
+    updatedAt: z.number().int(),
+    theme: z.enum(['light', 'dark', 'system']),
+    mistakeLimitOverrides: z.record(z.string(), z.number().int().positive().nullable()),
+    hintLimitOverrides: z.record(z.string(), z.number().int().positive().nullable()),
+});

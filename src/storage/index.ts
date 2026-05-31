@@ -4,7 +4,9 @@ export {
     deleteActiveGame,
     saveCompletedGame,
     loadCompletedGames,
+    loadSettings,
+    saveSettings,
     clearAllData,
 } from './indexedDbRepository.ts';
 
-export type { PersistedGame, PersistedCompletedGame } from './types.ts';
+export type { PersistedGame, PersistedCompletedGame, PersistedSettings } from './types.ts';

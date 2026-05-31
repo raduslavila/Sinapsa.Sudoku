@@ -13,6 +13,8 @@ interface Props {
     savedGame?: SavedGameSummary;
     onContinue?: () => void;
     onDeleteSave?: () => void;
+    onStatistics?: () => void;
+    onSettings?: () => void;
 }
 
 function formatElapsed(ms: number): string {
@@ -22,7 +24,7 @@ function formatElapsed(ms: number): string {
     return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave }: Props) {
+export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onStatistics, onSettings }: Props) {
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     return (
@@ -211,6 +213,46 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave }: Pro
                         <span style={{ fontSize: 12, color: '#888' }}>{d.description}</span>
                     </button>
                 ))}
+            </div>
+
+            {/* Secondary nav */}
+            <div style={{ display: 'flex', gap: 12 }}>
+                {onStatistics && (
+                    <button
+                        type="button"
+                        onClick={onStatistics}
+                        style={{
+                            padding: '8px 20px',
+                            borderRadius: 8,
+                            background: 'var(--color-btn-bg)',
+                            border: 'none',
+                            color: 'var(--color-given)',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                        }}
+                    >
+                        Statistics
+                    </button>
+                )}
+                {onSettings && (
+                    <button
+                        type="button"
+                        onClick={onSettings}
+                        style={{
+                            padding: '8px 20px',
+                            borderRadius: 8,
+                            background: 'var(--color-btn-bg)',
+                            border: 'none',
+                            color: 'var(--color-given)',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                        }}
+                    >
+                        Settings
+                    </button>
+                )}
             </div>
         </main>
     );

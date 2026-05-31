@@ -28,6 +28,10 @@ export interface GameState {
     readonly pausedAt: number | null;
     /** Cell index highlighted by the Hint button (but not yet filled). null = none. */
     readonly hintedIndex: number | null;
+    /** Number of hints used this game (via applyHint). */
+    readonly hintsUsed: number;
+    /** Max hints allowed this game. null = unlimited. */
+    readonly hintLimit: number | null;
 }
 
 export const IDLE_STATE: GameState = {
@@ -45,6 +49,8 @@ export const IDLE_STATE: GameState = {
     startedAt: null,
     pausedAt: null,
     hintedIndex: null,
+    hintsUsed: 0,
+    hintLimit: null,
 };
 
 // ---------------------------------------------------------------------------
@@ -100,6 +106,7 @@ export function createGame(
     puzzle: Puzzle,
     mistakeLimit: number | null,
     now: number,
+    hintLimit: number | null = null,
 ): GameState {
     return {
         puzzle,
@@ -116,6 +123,8 @@ export function createGame(
         startedAt: now,
         pausedAt: null,
         hintedIndex: null,
+        hintsUsed: 0,
+        hintLimit,
     };
 }
 
@@ -284,6 +293,7 @@ export function resume(state: GameState, now: number): GameState {
 export function hintCell(state: GameState): GameState {
     if (state.status !== 'playing') return state;
     if (state.puzzle === null) return state;
+    if (state.hintLimit !== null && state.hintsUsed >= state.hintLimit) return state;
 
     const hint = getHint(state.board, state.puzzle.solution);
     if (hint === null) return state;
@@ -298,11 +308,13 @@ export function hintCell(state: GameState): GameState {
 export function applyHint(state: GameState): GameState {
     if (state.status !== 'playing') return state;
     if (state.puzzle === null) return state;
+    if (state.hintLimit !== null && state.hintsUsed >= state.hintLimit) return state;
 
     const hint = getHint(state.board, state.puzzle.solution);
     if (hint === null) return state;
 
-    return { ...placeDigit(selectCell(state, hint.index), hint.digit), hintedIndex: null };
+    const next = { ...placeDigit(selectCell(state, hint.index), hint.digit), hintedIndex: null };
+    return { ...next, hintsUsed: state.hintsUsed + 1 };
 }
 
 /** Returns total elapsed milliseconds at the given wall-clock time. */

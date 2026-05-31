@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 import type { Digit, DifficultyId } from '../engine/types.ts';
 import { generatePuzzle } from '../engine/generator.ts';
 import { getDifficultyConfig } from '../config/difficulties.ts';
+import { useSettingsStore, effectiveMistakeLimit, effectiveHintLimit } from './settingsStore.ts';
 import type { GameState } from './gameState.ts';
 import {
     IDLE_STATE,
@@ -33,7 +34,13 @@ import {
 /** Persists `next` state after a mutation. Fire-and-forget. */
 function persistAfterMove(next: GameState): void {
     if (next.status === 'won' || next.status === 'over') {
-        void saveCompletedGame(next);
+        // elapsedMs only accumulates on pause. Add the running segment before saving.
+        // We can't use getElapsedMsAction here because it checks status === 'playing'.
+        const frozenElapsedMs =
+            next.startedAt !== null
+                ? next.elapsedMs + (Date.now() - next.startedAt)
+                : next.elapsedMs;
+        void saveCompletedGame({ ...next, elapsedMs: frozenElapsedMs, startedAt: null });
         void deleteActiveGame();
     } else {
         void saveActiveGame(next);
@@ -66,8 +73,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     startGame: (difficultyId) => {
         const seed = nanoid();
         const config = getDifficultyConfig(difficultyId);
+        const { mistakeLimitOverrides, hintLimitOverrides } = useSettingsStore.getState();
+        const mistakeLimit = effectiveMistakeLimit(mistakeLimitOverrides, difficultyId, config.defaultMistakeLimit);
+        const hintLimit = effectiveHintLimit(hintLimitOverrides, difficultyId);
         const puzzle = generatePuzzle(seed, difficultyId);
-        const next = createGame(puzzle, config.defaultMistakeLimit, Date.now());
+        const next = createGame(puzzle, mistakeLimit, Date.now(), hintLimit);
         set({ game: next });
         void saveActiveGame(next);
     },

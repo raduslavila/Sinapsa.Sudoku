@@ -3,7 +3,7 @@ import { CURRENT_SCHEMA_VERSION } from './types.ts';
 
 /** DB name and current version for IndexedDB. */
 export const DB_NAME = 'sinapsa-sudoku';
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
 /**
  * Called by openDatabase's `upgrade` callback.
@@ -15,7 +15,10 @@ export function applyMigrations(db: IDBPDatabase, oldVersion: number): void {
         db.createObjectStore('activeGame');         // key = 'active' (singleton)
         db.createObjectStore('completedGames');     // key = game id (nanoid)
     }
-    // Future: if (oldVersion < 2) { ... }
+    if (oldVersion < 2) {
+        // v2: add settings store
+        db.createObjectStore('settings');           // key = 'global' (singleton)
+    }
 }
 
 /** Minimum schema version we can safely read without migration. */

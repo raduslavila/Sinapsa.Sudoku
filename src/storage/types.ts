@@ -33,11 +33,26 @@ export interface PersistedGame {
     // History (shallow — only last 50 entries to cap size)
     readonly undoStack: readonly PersistedSnapshot[];
     readonly redoStack: readonly PersistedSnapshot[];
+
+    // Optional — introduced after initial schema, defaults applied on load
+    readonly hintsUsed?: number;
+    readonly hintLimit?: number | null;
 }
 
 export interface PersistedSnapshot {
     readonly board: string;
     readonly notes: readonly (readonly [number, readonly Digit[]])[];
+}
+
+/** Settings saved to IndexedDB. */
+export interface PersistedSettings {
+    readonly schemaVersion: number;
+    readonly updatedAt: number;
+    readonly theme: 'light' | 'dark' | 'system';
+    /** Per-difficulty mistake limit overrides. Key is DifficultyId as string. */
+    readonly mistakeLimitOverrides: Readonly<Record<string, number | null>>;
+    /** Per-difficulty hint limit overrides. Key is DifficultyId as string. null = unlimited. */
+    readonly hintLimitOverrides: Readonly<Record<string, number | null>>;
 }
 
 /** A completed game summary stored in IndexedDB. */

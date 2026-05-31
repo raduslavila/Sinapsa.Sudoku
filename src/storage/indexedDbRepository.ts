@@ -7,12 +7,13 @@ import {
     CURRENT_SCHEMA_VERSION,
     type PersistedGame,
     type PersistedCompletedGame,
+    type PersistedSettings,
     type PersistedSnapshot,
     parseBoardString,
     serializeBoardArray,
 } from './types.ts';
 import { DB_NAME, DB_VERSION, applyMigrations, isCompatibleSchemaVersion } from './migrations.ts';
-import { persistedGameSchema, persistedCompletedGameSchema } from './schemas.ts';
+import { persistedGameSchema, persistedCompletedGameSchema, settingsSchema } from './schemas.ts';
 
 // ---------------------------------------------------------------------------
 // DB singleton
@@ -90,6 +91,9 @@ function gameStateToRecord(state: GameState): PersistedGame {
 
         undoStack: state.undoStack.slice(-MAX_UNDO_STACK).map(serializeSnapshot),
         redoStack: state.redoStack.slice(-MAX_UNDO_STACK).map(serializeSnapshot),
+
+        hintsUsed: state.hintsUsed,
+        hintLimit: state.hintLimit,
     };
 }
 
@@ -131,6 +135,8 @@ function recordToGameState(raw: unknown): GameState | null {
         startedAt: Date.now(),
         pausedAt: null,
         hintedIndex: null,
+        hintsUsed: r.hintsUsed ?? 0,
+        hintLimit: r.hintLimit ?? null,
     };
 }
 
@@ -230,6 +236,36 @@ export async function clearAllData(): Promise<void> {
         const db = await getDb();
         await db.clear('activeGame');
         await db.clear('completedGames');
+        await db.clear('settings');
+    } catch {
+        // Ignore
+    }
+}
+
+/**
+ * Loads persisted settings. Returns null if none saved yet.
+ */
+export async function loadSettings(): Promise<PersistedSettings | null> {
+    try {
+        const db = await getDb();
+        const raw = await db.get('settings', 'global');
+        if (!raw) return null;
+        const parsed = settingsSchema.safeParse(raw);
+        if (!parsed.success) return null;
+        if (!isCompatibleSchemaVersion(parsed.data.schemaVersion)) return null;
+        return parsed.data;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Persists the current settings object.
+ */
+export async function saveSettings(settings: PersistedSettings): Promise<void> {
+    try {
+        const db = await getDb();
+        await db.put('settings', settings, 'global');
     } catch {
         // Ignore
     }

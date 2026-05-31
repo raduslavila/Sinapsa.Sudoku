@@ -72,13 +72,15 @@
 - ✅ Continue game on app launch (`loadActiveGame` in App.tsx).
 - ✅ Repository serialization tests (24 tests).
 
-## Milestone 6 — Statistics and settings
+## ✅ Milestone 6 — Statistics and settings
 
-- Settings screen.
-- Statistics screen.
-- Configurable mistake limits per difficulty (with IAP extension hook for buying extra mistakes).
-- Configurable hint limits per difficulty (with IAP extension hook for buying extra hints or watching ads).
-- Theme setting.
+- ✅ Settings screen (theme, per-difficulty mistake/hint limits).
+- ✅ Statistics screen (totals, win rate, best/avg time per difficulty).
+- ✅ Configurable mistake limits per difficulty (with override; default from config).
+- ✅ Configurable hint limit per difficulty (hintsUsed tracked in game state).
+- ✅ Theme setting (Light / Dark / System) with CSS custom-property dark mode.
+- ✅ `settingsStore` with IndexedDB persistence (Zod-validated, DB v2 migration).
+- ✅ `computeStatistics` pure function with 8 unit tests.
 
 ## Milestone 7 — Android packaging
 

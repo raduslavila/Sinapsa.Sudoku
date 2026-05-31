@@ -1,0 +1,238 @@
+import { useSettingsStore } from '../state/settingsStore.ts';
+import type { Theme } from '../state/settingsStore.ts';
+import { DIFFICULTIES } from '../config/difficulties.ts';
+import type { DifficultyId } from '../engine/types.ts';
+
+interface Props {
+    onBack: () => void;
+}
+
+// ---------------------------------------------------------------------------
+// Sub-components
+// ---------------------------------------------------------------------------
+
+function ThemeButton({
+    label,
+    value,
+    current,
+    onSelect,
+}: {
+    label: string;
+    value: Theme;
+    current: Theme;
+    onSelect: (t: Theme) => void;
+}) {
+    const active = value === current;
+    return (
+        <button
+            type="button"
+            onClick={() => onSelect(value)}
+            style={{
+                flex: 1,
+                padding: '8px 4px',
+                borderRadius: 8,
+                border: `1.5px solid ${active ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                background: active ? 'var(--color-primary)' : 'var(--color-surface)',
+                color: active ? '#fff' : 'var(--color-given)',
+                fontWeight: active ? 700 : 400,
+                fontSize: 14,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+            }}
+        >
+            {label}
+        </button>
+    );
+}
+
+function LimitInput({
+    value,
+    defaultValue,
+    onChange,
+    placeholder,
+}: {
+    value: number | null | undefined;
+    defaultValue: number | null;
+    onChange: (v: number | null | undefined) => void;
+    placeholder: string;
+}) {
+    // undefined = use default, null = unlimited override, number = custom value
+    const isDefault = value === undefined;
+    const displayValue = isDefault
+        ? (defaultValue === null ? '' : String(defaultValue))
+        : (value === null ? '' : String(value));
+
+    return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <input
+                type="number"
+                min={1}
+                max={99}
+                value={displayValue}
+                placeholder={placeholder}
+                onChange={(e) => {
+                    const raw = e.target.value.trim();
+                    if (raw === '') {
+                        onChange(null); // unlimited override
+                    } else {
+                        const n = parseInt(raw, 10);
+                        if (!isNaN(n) && n >= 1) onChange(n);
+                    }
+                }}
+                style={{
+                    width: 52,
+                    padding: '4px 6px',
+                    borderRadius: 6,
+                    border: `1px solid ${isDefault ? 'var(--color-border)' : 'var(--color-primary)'}`,
+                    background: 'var(--color-surface)',
+                    color: 'var(--color-given)',
+                    fontSize: 13,
+                    textAlign: 'center',
+                }}
+            />
+            {!isDefault && (
+                <button
+                    type="button"
+                    title="Reset to default"
+                    onClick={() => onChange(undefined)}
+                    style={{
+                        fontSize: 12,
+                        color: '#888',
+                        cursor: 'pointer',
+                        padding: '2px 4px',
+                        border: 'none',
+                        background: 'none',
+                    }}
+                >
+                    ↩
+                </button>
+            )}
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Main screen
+// ---------------------------------------------------------------------------
+
+export function SettingsScreen({ onBack }: Props) {
+    const theme = useSettingsStore((s) => s.theme);
+    const mistakeLimitOverrides = useSettingsStore((s) => s.mistakeLimitOverrides);
+    const hintLimitOverrides = useSettingsStore((s) => s.hintLimitOverrides);
+    const setTheme = useSettingsStore((s) => s.setTheme);
+    const setMistakeLimit = useSettingsStore((s) => s.setMistakeLimit);
+    const setHintLimit = useSettingsStore((s) => s.setHintLimit);
+
+    return (
+        <main
+            style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: '16px 16px 32px',
+                gap: 24,
+                overflowY: 'auto',
+            }}
+        >
+            {/* Header */}
+            <div
+                style={{
+                    width: '100%',
+                    maxWidth: 400,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                }}
+            >
+                <button
+                    type="button"
+                    onClick={onBack}
+                    aria-label="Back"
+                    style={{
+                        fontSize: 14,
+                        color: 'var(--color-primary)',
+                        fontWeight: 600,
+                        padding: '4px 8px',
+                    }}
+                >
+                    ← Back
+                </button>
+                <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-given)' }}>
+                    Settings
+                </h2>
+            </div>
+
+            {/* Theme */}
+            <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>Theme</h3>
+                <div style={{ display: 'flex', gap: 8 }}>
+                    <ThemeButton label="Light" value="light" current={theme} onSelect={setTheme} />
+                    <ThemeButton label="Dark" value="dark" current={theme} onSelect={setTheme} />
+                    <ThemeButton label="System" value="system" current={theme} onSelect={setTheme} />
+                </div>
+            </section>
+
+            {/* Limits table */}
+            <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>
+                    Limits per difficulty
+                </h3>
+                <p style={{ fontSize: 12, color: '#888' }}>
+                    Mistakes: max wrong placements per game (empty = unlimited).
+                    Hints: max hints per game (empty = unlimited).
+                </p>
+
+                {/* Column headers */}
+                <div
+                    style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 80px 80px',
+                        gap: 8,
+                        padding: '0 4px',
+                    }}
+                >
+                    <span style={{ fontSize: 12, color: '#888' }}>Difficulty</span>
+                    <span style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>Mistakes</span>
+                    <span style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>Hints</span>
+                </div>
+
+                {DIFFICULTIES.map((d) => {
+                    const mistakeVal = mistakeLimitOverrides[d.id as DifficultyId];
+                    const hintVal = hintLimitOverrides[d.id as DifficultyId];
+                    return (
+                        <div
+                            key={d.id}
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 80px 80px',
+                                gap: 8,
+                                alignItems: 'center',
+                                padding: '8px',
+                                background: 'var(--color-surface)',
+                                borderRadius: 8,
+                                border: '1px solid var(--color-border)',
+                            }}
+                        >
+                            <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-given)' }}>
+                                {d.name}
+                            </span>
+                            <LimitInput
+                                value={mistakeVal}
+                                defaultValue={d.defaultMistakeLimit}
+                                onChange={(v) => setMistakeLimit(d.id as DifficultyId, v)}
+                                placeholder={d.defaultMistakeLimit === null ? '∞' : String(d.defaultMistakeLimit)}
+                            />
+                            <LimitInput
+                                value={hintVal}
+                                defaultValue={null}
+                                onChange={(v) => setHintLimit(d.id as DifficultyId, v)}
+                                placeholder="∞"
+                            />
+                        </div>
+                    );
+                })}
+            </section>
+        </main>
+    );
+}

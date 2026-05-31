@@ -3,10 +3,15 @@ import type { DifficultyId } from './engine/types.ts';
 import type { Digit } from './engine/types.ts';
 import type { GameState } from './state/gameState.ts';
 import { useGameStore } from './state/gameStore.ts';
+import { useSettingsStore } from './state/settingsStore.ts';
 import { HomeScreen } from './screens/HomeScreen.tsx';
 import { GameScreen } from './screens/GameScreen.tsx';
+import { SettingsScreen } from './screens/SettingsScreen.tsx';
+import { StatisticsScreen } from './screens/StatisticsScreen.tsx';
 import { loadActiveGame, deleteActiveGame } from './storage/index.ts';
 import { getDifficultyConfig } from './config/difficulties.ts';
+
+type IdleScreen = 'home' | 'settings' | 'statistics';
 
 export default function App() {
   const game = useGameStore((s) => s.game);
@@ -22,12 +27,23 @@ export default function App() {
   const setNotesMode = useGameStore((s) => s.setNotesMode);
   const pause = useGameStore((s) => s.pause);
   const resume = useGameStore((s) => s.resume);
+  const initSettings = useSettingsStore((s) => s.init);
+
+  const [idleScreen, setIdleScreen] = useState<IdleScreen>('home');
 
   // Loaded from IndexedDB whenever the app is on the home screen (mount + after going home).
   const [pendingSave, setPendingSave] = useState<GameState | null>(null);
 
+  // Init settings once on mount.
+  useEffect(() => {
+    void initSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // When game returns to idle (Home pressed), reload saved game and reset to home.
   useEffect(() => {
     if (game.status !== 'idle') return;
+    setIdleScreen('home');
     loadActiveGame().then((saved) => {
       setPendingSave(saved ?? null);
     }).catch(() => {/* ignore */ });
@@ -56,30 +72,40 @@ export default function App() {
     void deleteActiveGame();
   };
 
-  if (game.status === 'idle') {
+  if (game.status !== 'idle') {
     return (
-      <HomeScreen
-        onStart={(id: DifficultyId) => startGame(id)}
-        savedGame={savedGameSummary}
-        onContinue={handleContinue}
-        onDeleteSave={handleDeleteSave}
+      <GameScreen
+        game={game}
+        onSelectCell={selectCell}
+        onDigitInput={(d: Digit) => handleDigitInput(d)}
+        onClear={clearCell}
+        onUndo={undo}
+        onHintSelect={hintCell}
+        onHintApply={applyHint}
+        onToggleNotes={() => setNotesMode(!game.notesMode)}
+        onPause={pause}
+        onResume={resume}
+        onHome={goHome}
       />
     );
   }
 
+  if (idleScreen === 'settings') {
+    return <SettingsScreen onBack={() => setIdleScreen('home')} />;
+  }
+
+  if (idleScreen === 'statistics') {
+    return <StatisticsScreen onBack={() => setIdleScreen('home')} />;
+  }
+
   return (
-    <GameScreen
-      game={game}
-      onSelectCell={selectCell}
-      onDigitInput={(d: Digit) => handleDigitInput(d)}
-      onClear={clearCell}
-      onUndo={undo}
-      onHintSelect={hintCell}
-      onHintApply={applyHint}
-      onToggleNotes={() => setNotesMode(!game.notesMode)}
-      onPause={pause}
-      onResume={resume}
-      onHome={goHome}
+    <HomeScreen
+      onStart={(id: DifficultyId) => startGame(id)}
+      savedGame={savedGameSummary}
+      onContinue={handleContinue}
+      onDeleteSave={handleDeleteSave}
+      onStatistics={() => setIdleScreen('statistics')}
+      onSettings={() => setIdleScreen('settings')}
     />
   );
 }
