@@ -89,16 +89,17 @@
 - ✅ Build web app and sync assets into Android project (`cap sync android`).
 - ✅ GitHub Actions release workflow — signed APK + AAB on tag push.
 
-## Milestone 7.1 — App identity and visual polish
+## ✅ Milestone 7.1 — App identity and visual polish
 
-- App icon (adaptive icon — foreground + background layers).
-- Splash screen.
-- App name and short description localisation (`strings.xml`).
-- Android status bar color and window background color.
-- Web app favicon and `<title>`.
-- `manifest.webmanifest` for PWA (name, icons, theme_color, background_color).
-- Meta tags (`og:title`, `og:description`, `og:image`) for link previews.
-- Review and finalize color palette (primary, surface, accent) for both light and dark themes.
+- ✅ App icon (adaptive icon — foreground + background layers).
+- ✅ Splash screen not needed — `Theme.SplashScreen` shows `ic_launcher` on `colorBackground` automatically.
+- ✅ App name and short description localisation (`strings.xml`).
+- ✅ Android status bar transparent, navigation bar matches `colorBackground`.
+- ✅ Web app favicon and `<title>` (Sudoku Synapse).
+- ✅ `manifest.webmanifest` for PWA (name, icons, theme_color, background_color).
+- ✅ Meta tags (`og:title`, `og:description`, `og:type`) for link previews.
+- ✅ 7-palette color system (electric-blue, midnight-purple, forest-green, sunset-orange, rose-gold, obsidian, arctic) with light/dark variants.
+- ✅ Orientation locked to portrait (`android:screenOrientation="portrait"`).
 
 ## Milestone 8 — Play Games bridge stub
 
