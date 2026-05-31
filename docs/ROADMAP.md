@@ -82,12 +82,12 @@
 - ✅ `settingsStore` with IndexedDB persistence (Zod-validated, DB v2 migration).
 - ✅ `computeStatistics` pure function with 8 unit tests.
 
-## Milestone 7 — Android packaging
+## ✅ Milestone 7 — Android packaging
 
-- Add Capacitor Android.
-- Configure app metadata.
-- Test Android build.
-- Prepare signed AAB later.
+- ✅ Add Capacitor Android (`cap add android`).
+- ✅ Configure app metadata (`capacitor.config.ts` — appId, appName, webDir).
+- ✅ Build web app and sync assets into Android project (`cap sync android`).
+- ⏳ Prepare signed AAB (Play Store release — future step).
 
 ## Milestone 8 — Play Games bridge stub
 
