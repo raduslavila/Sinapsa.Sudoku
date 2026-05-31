@@ -102,7 +102,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => {
             const next = s.game.notesMode
                 ? toggleNoteAction(s.game, digit)
-                : placeDigitAction(s.game, digit);
+                : placeDigitAction(s.game, digit, Date.now());
             persistAfterMove(next);
             return { game: next };
         });
@@ -154,7 +154,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     applyHint: () => {
         set((s) => {
-            const next = applyHintAction(s.game);
+            const next = applyHintAction(s.game, Date.now());
             persistAfterMove(next);
             return { game: next };
         });

@@ -8,6 +8,8 @@ import type { PersistedCompletedGame } from '../storage/types.ts';
 export interface DifficultyStats {
     readonly played: number;
     readonly won: number;
+    readonly totalHintsUsed: number;
+    readonly totalMistakes: number;
     readonly bestTimeMs: number | null;
     readonly avgTimeMs: number | null;
 }
@@ -27,16 +29,24 @@ export interface Statistics {
  * Pure — no side effects, safe to call in tests.
  */
 export function computeStatistics(games: readonly PersistedCompletedGame[]): Statistics {
-    const map = new Map<DifficultyId, { played: number; won: number; times: number[] }>();
+    const map = new Map<DifficultyId, {
+        played: number;
+        won: number;
+        totalHintsUsed: number;
+        totalMistakes: number;
+        times: number[];
+    }>();
 
     for (const g of games) {
         const id = g.difficultyId;
         let entry = map.get(id);
         if (!entry) {
-            entry = { played: 0, won: 0, times: [] };
+            entry = { played: 0, won: 0, totalHintsUsed: 0, totalMistakes: 0, times: [] };
             map.set(id, entry);
         }
         entry.played++;
+        entry.totalHintsUsed += g.hintsUsed ?? 0;
+        entry.totalMistakes += g.mistakeCount;
         if (g.status === 'won') {
             entry.won++;
             // Exclude zero-elapsed records (legacy saves before timing fix).
@@ -56,6 +66,8 @@ export function computeStatistics(games: readonly PersistedCompletedGame[]): Sta
         byDifficulty[id] = {
             played: entry.played,
             won: entry.won,
+            totalHintsUsed: entry.totalHintsUsed,
+            totalMistakes: entry.totalMistakes,
             bestTimeMs,
             avgTimeMs,
         };

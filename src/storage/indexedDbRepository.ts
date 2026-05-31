@@ -205,6 +205,7 @@ export async function saveCompletedGame(state: GameState): Promise<void> {
             seed: state.puzzle.seed,
             difficultyId: state.puzzle.difficultyId,
             status: state.status,
+            hintsUsed: state.hintsUsed,
             mistakeCount: state.mistakeCount,
             elapsedMs: state.elapsedMs,
         };

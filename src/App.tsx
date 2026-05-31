@@ -40,10 +40,13 @@ export default function App() {
   const idleScreenRef = useRef(idleScreen);
   const goHomeRef = useRef(goHome);
   const pauseRef = useRef(pause);
-  gameStatusRef.current = game.status;
-  idleScreenRef.current = idleScreen;
-  goHomeRef.current = goHome;
-  pauseRef.current = pause;
+
+  useEffect(() => {
+    gameStatusRef.current = game.status;
+    idleScreenRef.current = idleScreen;
+    goHomeRef.current = goHome;
+    pauseRef.current = pause;
+  }, [game.status, idleScreen, goHome, pause]);
 
   // Init settings once on mount.
   useEffect(() => {
@@ -120,6 +123,12 @@ export default function App() {
     void deleteActiveGame();
   };
 
+  const handleNewGameFromCurrent = () => {
+    if (game.puzzle !== null) {
+      startGame(game.puzzle.difficultyId);
+    }
+  };
+
   if (game.status !== 'idle') {
     return (
       <GameScreen
@@ -134,6 +143,7 @@ export default function App() {
         onPause={pause}
         onResume={resume}
         onHome={goHome}
+        onNewGame={handleNewGameFromCurrent}
       />
     );
   }

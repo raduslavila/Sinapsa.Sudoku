@@ -9,8 +9,15 @@ interface Props {
     onBack: () => void;
 }
 
+const STATS_GRID_TEMPLATE = '1.7fr 0.7fr 0.7fr 0.9fr 1.1fr 1fr 1fr';
+
+function formatStatValue(value: number | null | undefined): string {
+    if (value === null || value === undefined) return '-';
+    return String(value);
+}
+
 function formatTime(ms: number | null): string {
-    if (ms === null) return '—';
+    if (ms === null) return '-';
     const totalSec = Math.floor(ms / 1000);
     const m = Math.floor(totalSec / 60);
     const s = totalSec % 60;
@@ -139,13 +146,22 @@ export function StatisticsScreen({ onBack }: Props) {
                         <div
                             style={{
                                 display: 'grid',
-                                gridTemplateColumns: '1fr 48px 48px 72px 72px',
-                                gap: 6,
+                                gridTemplateColumns: STATS_GRID_TEMPLATE,
+                                columnGap: 8,
                                 padding: '0 8px',
+                                alignItems: 'center',
                             }}
                         >
-                            {['Difficulty', 'Played', 'Won', 'Best', 'Avg'].map((h) => (
-                                <span key={h} style={{ fontSize: 11, color: '#888', textAlign: 'center' }}>
+                            {['Difficulty', 'Played', 'Won', 'Hints', 'Mistakes', 'Best', 'Avg'].map((h, index) => (
+                                <span
+                                    key={h}
+                                    style={{
+                                        fontSize: 11,
+                                        color: '#888',
+                                        textAlign: index === 0 ? 'left' : 'center',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
                                     {h}
                                 </span>
                             ))}
@@ -159,8 +175,8 @@ export function StatisticsScreen({ onBack }: Props) {
                                     key={d.id}
                                     style={{
                                         display: 'grid',
-                                        gridTemplateColumns: '1fr 48px 48px 72px 72px',
-                                        gap: 6,
+                                        gridTemplateColumns: STATS_GRID_TEMPLATE,
+                                        columnGap: 8,
                                         alignItems: 'center',
                                         padding: '10px 8px',
                                         background: 'var(--color-surface)',
@@ -171,16 +187,22 @@ export function StatisticsScreen({ onBack }: Props) {
                                     <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-given)' }}>
                                         {d.name}
                                     </span>
-                                    <span style={{ fontSize: 13, textAlign: 'center', color: 'var(--color-given)' }}>
-                                        {row.played}
+                                    <span style={{ fontSize: 13, textAlign: 'center', color: 'var(--color-given)', whiteSpace: 'nowrap' }}>
+                                        {formatStatValue(row.played)}
                                     </span>
-                                    <span style={{ fontSize: 13, textAlign: 'center', color: 'var(--color-hint)' }}>
-                                        {row.won}
+                                    <span style={{ fontSize: 13, textAlign: 'center', color: 'var(--color-hint)', whiteSpace: 'nowrap' }}>
+                                        {formatStatValue(row.won)}
                                     </span>
-                                    <span style={{ fontSize: 12, textAlign: 'center', color: 'var(--color-given)' }}>
+                                    <span style={{ fontSize: 12, textAlign: 'center', color: 'var(--color-primary)', whiteSpace: 'nowrap' }}>
+                                        {formatStatValue(row.totalHintsUsed)}
+                                    </span>
+                                    <span style={{ fontSize: 12, textAlign: 'center', color: 'var(--color-wrong)', whiteSpace: 'nowrap' }}>
+                                        {formatStatValue(row.totalMistakes)}
+                                    </span>
+                                    <span style={{ fontSize: 12, textAlign: 'center', color: 'var(--color-given)', whiteSpace: 'nowrap' }}>
                                         {formatTime(row.bestTimeMs)}
                                     </span>
-                                    <span style={{ fontSize: 12, textAlign: 'center', color: '#888' }}>
+                                    <span style={{ fontSize: 12, textAlign: 'center', color: '#888', whiteSpace: 'nowrap' }}>
                                         {formatTime(row.avgTimeMs)}
                                     </span>
                                 </div>

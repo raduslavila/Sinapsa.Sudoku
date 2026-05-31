@@ -161,6 +161,7 @@ describe('persistedCompletedGameSchema', () => {
         seed: 'some-seed',
         difficultyId: 5 as const,
         status: 'won' as const,
+        hintsUsed: 3,
         mistakeCount: 2,
         elapsedMs: 60000,
     };
@@ -171,6 +172,12 @@ describe('persistedCompletedGameSchema', () => {
 
     it('accepts a valid over record', () => {
         expect(persistedCompletedGameSchema.safeParse({ ...validCompleted, status: 'over' }).success).toBe(true);
+    });
+
+    it('accepts legacy records without hintsUsed', () => {
+        const legacyCompleted = { ...validCompleted, hintsUsed: undefined };
+        delete legacyCompleted.hintsUsed;
+        expect(persistedCompletedGameSchema.safeParse(legacyCompleted).success).toBe(true);
     });
 
     it('rejects status playing', () => {

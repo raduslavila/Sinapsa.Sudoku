@@ -97,6 +97,22 @@ function isFullyCorrect(board: readonly CellValue[], solution: SudokuGrid): bool
     return isSolved(board) && board.every((v, i) => v === solution[i]);
 }
 
+function finalizeIfEnded(state: GameState, status: GameStatus, now: number): Pick<GameState, 'elapsedMs' | 'startedAt' | 'pausedAt'> {
+    if ((status !== 'won' && status !== 'over') || state.startedAt === null) {
+        return {
+            elapsedMs: state.elapsedMs,
+            startedAt: state.startedAt,
+            pausedAt: state.pausedAt,
+        };
+    }
+
+    return {
+        elapsedMs: state.elapsedMs + (now - state.startedAt),
+        startedAt: null,
+        pausedAt: null,
+    };
+}
+
 // ---------------------------------------------------------------------------
 // Public actions
 // ---------------------------------------------------------------------------
@@ -141,7 +157,7 @@ export function selectCell(state: GameState, index: number): GameState {
  * - A correct placement auto-removes the digit from peer notes.
  * - A wrong placement increments mistakeCount and may trigger game over.
  */
-export function placeDigit(state: GameState, digit: Digit): GameState {
+export function placeDigit(state: GameState, digit: Digit, now: number = Date.now()): GameState {
     if (state.status !== 'playing') return state;
     if (state.selectedIndex === null) return state;
     if (state.puzzle === null) return state;
@@ -177,6 +193,7 @@ export function placeDigit(state: GameState, digit: Digit): GameState {
         notes,
         mistakeCount,
         status,
+        ...finalizeIfEnded(state, status, now),
         hintedIndex: null,
     };
 }
@@ -314,7 +331,7 @@ export function hintCell(state: GameState): GameState {
  * Reveals the simplest available hint (first empty cell from the solution).
  * Internally selects the cell and places the correct digit.
  */
-export function applyHint(state: GameState): GameState {
+export function applyHint(state: GameState, now: number = Date.now()): GameState {
     if (state.status !== 'playing') return state;
     if (state.puzzle === null) return state;
     if (state.hintLimit !== null && state.hintsUsed >= state.hintLimit) return state;
@@ -322,7 +339,7 @@ export function applyHint(state: GameState): GameState {
     const hint = getHint(state.board, state.puzzle.solution);
     if (hint === null) return state;
 
-    const next = { ...placeDigit(selectCell(state, hint.index), hint.digit), hintedIndex: null };
+    const next = { ...placeDigit(selectCell(state, hint.index), hint.digit, now), hintedIndex: null };
     return { ...next, hintsUsed: state.hintsUsed + 1 };
 }
 

@@ -52,6 +52,7 @@ export const persistedCompletedGameSchema = z.object({
     seed: z.string().min(1),
     difficultyId: difficultyIdSchema,
     status: z.enum(['won', 'over']),
+    hintsUsed: z.number().int().min(0).optional(),
     mistakeCount: z.number().int().min(0),
     elapsedMs: z.number().int().min(0),
 });

@@ -16,6 +16,7 @@ function makeGame(
         seed: 'seed',
         difficultyId: 1,
         status: 'won',
+        hintsUsed: 0,
         mistakeCount: 0,
         elapsedMs: 60000,
         ...overrides,
@@ -40,6 +41,8 @@ describe('computeStatistics', () => {
         expect(stats.totalWon).toBe(1);
         expect(stats.byDifficulty[1]?.played).toBe(1);
         expect(stats.byDifficulty[1]?.won).toBe(1);
+        expect(stats.byDifficulty[1]?.totalHintsUsed).toBe(0);
+        expect(stats.byDifficulty[1]?.totalMistakes).toBe(0);
         expect(stats.byDifficulty[1]?.bestTimeMs).toBe(120000);
         expect(stats.byDifficulty[1]?.avgTimeMs).toBe(120000);
     });
@@ -50,6 +53,8 @@ describe('computeStatistics', () => {
         expect(stats.totalWon).toBe(0);
         expect(stats.byDifficulty[1]?.played).toBe(1);
         expect(stats.byDifficulty[1]?.won).toBe(0);
+        expect(stats.byDifficulty[1]?.totalHintsUsed).toBe(0);
+        expect(stats.byDifficulty[1]?.totalMistakes).toBe(0);
         // No winning time recorded
         expect(stats.byDifficulty[1]?.bestTimeMs).toBeNull();
         expect(stats.byDifficulty[1]?.avgTimeMs).toBeNull();
@@ -76,9 +81,9 @@ describe('computeStatistics', () => {
 
     it('separates stats by difficulty', () => {
         const games = [
-            makeGame({ id: 'a', difficultyId: 1, status: 'won', elapsedMs: 60000 }),
-            makeGame({ id: 'b', difficultyId: 3, status: 'over', elapsedMs: 0 }),
-            makeGame({ id: 'c', difficultyId: 3, status: 'won', elapsedMs: 45000 }),
+            makeGame({ id: 'a', difficultyId: 1, status: 'won', elapsedMs: 60000, hintsUsed: 1, mistakeCount: 2 }),
+            makeGame({ id: 'b', difficultyId: 3, status: 'over', elapsedMs: 0, hintsUsed: 4, mistakeCount: 3 }),
+            makeGame({ id: 'c', difficultyId: 3, status: 'won', elapsedMs: 45000, hintsUsed: 2, mistakeCount: 1 }),
         ];
         const stats = computeStatistics(games);
         expect(stats.totalPlayed).toBe(3);
@@ -86,6 +91,10 @@ describe('computeStatistics', () => {
         expect(stats.byDifficulty[1]?.played).toBe(1);
         expect(stats.byDifficulty[3]?.played).toBe(2);
         expect(stats.byDifficulty[3]?.won).toBe(1);
+        expect(stats.byDifficulty[1]?.totalHintsUsed).toBe(1);
+        expect(stats.byDifficulty[1]?.totalMistakes).toBe(2);
+        expect(stats.byDifficulty[3]?.totalHintsUsed).toBe(6);
+        expect(stats.byDifficulty[3]?.totalMistakes).toBe(4);
         expect(stats.byDifficulty[3]?.bestTimeMs).toBe(45000);
     });
 
@@ -101,9 +110,9 @@ describe('computeStatistics', () => {
 
     it('handles mix of difficulties and statuses', () => {
         const games = [
-            makeGame({ id: '1', difficultyId: 1, status: 'won', elapsedMs: 100000 }),
-            makeGame({ id: '2', difficultyId: 1, status: 'over', elapsedMs: 50000 }),
-            makeGame({ id: '3', difficultyId: 5, status: 'won', elapsedMs: 200000 }),
+            makeGame({ id: '1', difficultyId: 1, status: 'won', elapsedMs: 100000, hintsUsed: 3, mistakeCount: 1 }),
+            makeGame({ id: '2', difficultyId: 1, status: 'over', elapsedMs: 50000, hintsUsed: 1, mistakeCount: 2 }),
+            makeGame({ id: '3', difficultyId: 5, status: 'won', elapsedMs: 200000, hintsUsed: 5, mistakeCount: 0 }),
         ];
         const stats = computeStatistics(games);
         expect(stats.totalPlayed).toBe(3);
@@ -111,6 +120,20 @@ describe('computeStatistics', () => {
         expect(Object.keys(stats.byDifficulty)).toHaveLength(2);
         expect(stats.byDifficulty[1]?.played).toBe(2);
         expect(stats.byDifficulty[1]?.won).toBe(1);
+        expect(stats.byDifficulty[1]?.totalHintsUsed).toBe(4);
+        expect(stats.byDifficulty[1]?.totalMistakes).toBe(3);
         expect(stats.byDifficulty[5]?.played).toBe(1);
+        expect(stats.byDifficulty[5]?.totalHintsUsed).toBe(5);
+        expect(stats.byDifficulty[5]?.totalMistakes).toBe(0);
+    });
+
+    it('treats missing hint counts from legacy records as zero', () => {
+        const stats = computeStatistics([
+            makeGame({ id: 'legacy-a', difficultyId: 2, hintsUsed: undefined, mistakeCount: 4 }),
+            makeGame({ id: 'legacy-b', difficultyId: 2, hintsUsed: 2, mistakeCount: 1 }),
+        ]);
+
+        expect(stats.byDifficulty[2]?.totalHintsUsed).toBe(2);
+        expect(stats.byDifficulty[2]?.totalMistakes).toBe(5);
     });
 });

@@ -156,6 +156,21 @@ describe('placeDigit', () => {
         expect(g.status).toBe('over');
     });
 
+    it('freezes elapsed time when a mistake ends the game', () => {
+        const withElapsed = {
+            ...withSelection(2, 1),
+            elapsedMs: 8_000,
+            startedAt: 600,
+        };
+
+        const over = placeDigit(withElapsed, 1, NOW);
+
+        expect(over.status).toBe('over');
+        expect(over.elapsedMs).toBe(8_400);
+        expect(over.startedAt).toBeNull();
+        expect(getElapsedMs(over, NOW + 10_000)).toBe(8_400);
+    });
+
     it('does not trigger game over while below the limit', () => {
         const g = placeDigit(withSelection(2, 3), 1); // limit=3, one wrong → still playing
         expect(g.status).toBe('playing');
@@ -173,6 +188,31 @@ describe('placeDigit', () => {
         };
         const g = placeDigit(selectCell(createGame(puzzle, null, NOW), 0), 5);
         expect(g.status).toBe('won');
+    });
+
+    it('freezes elapsed time when the last correct move wins the game', () => {
+        const almostSolved = [...SOLVED_GRID] as import('../engine/types.ts').CellValue[];
+        almostSolved[0] = 0;
+        const puzzle: Puzzle = {
+            seed: 'near-win-timer',
+            grid: almostSolved,
+            solution: SOLVED_GRID,
+            difficultyId: 1,
+            givens: new Set(almostSolved.reduce<number[]>((a, v, i) => { if (v !== 0) a.push(i); return a; }, [])),
+        };
+
+        const withElapsed = {
+            ...createGame(puzzle, null, NOW),
+            elapsedMs: 15_000,
+            startedAt: 250,
+        };
+
+        const won = placeDigit(selectCell(withElapsed, 0), 5, NOW);
+
+        expect(won.status).toBe('won');
+        expect(won.elapsedMs).toBe(15_750);
+        expect(won.startedAt).toBeNull();
+        expect(getElapsedMs(won, NOW + 10_000)).toBe(15_750);
     });
 
     it('does not change a given cell', () => {

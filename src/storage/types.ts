@@ -67,6 +67,7 @@ export interface PersistedCompletedGame {
     readonly seed: string;
     readonly difficultyId: DifficultyId;
     readonly status: 'won' | 'over';
+    readonly hintsUsed?: number;
     readonly mistakeCount: number;
     readonly elapsedMs: number;
 }
