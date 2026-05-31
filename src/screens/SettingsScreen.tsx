@@ -316,9 +316,9 @@ export function SettingsScreen({ onBack }: Props) {
                             />
                             <LimitInput
                                 value={hintVal}
-                                defaultValue={null}
+                                defaultValue={d.defaultHintLimit}
                                 onChange={(v) => setHintLimit(d.id as DifficultyId, v)}
-                                placeholder="∞"
+                                placeholder={d.defaultHintLimit === null ? '∞' : String(d.defaultHintLimit)}
                             />
                         </div>
                     );

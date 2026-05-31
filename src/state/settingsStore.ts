@@ -199,6 +199,7 @@ export function effectiveMistakeLimit(
 export function effectiveHintLimit(
     overrides: Partial<Record<DifficultyId, number | null>>,
     difficultyId: DifficultyId,
+    defaultLimit: number | null,
 ): number | null {
-    return overrides[difficultyId] ?? null;
+    return difficultyId in overrides ? (overrides[difficultyId] ?? null) : defaultLimit;
 }

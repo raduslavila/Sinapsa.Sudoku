@@ -1,4 +1,5 @@
 import type { Digit } from '../engine/types.ts';
+import type { RemainingDigitCounts } from './numberPadCounts.ts';
 
 interface Props {
     onDigit: (d: Digit) => void;
@@ -9,6 +10,8 @@ interface Props {
     notesMode: boolean;
     onToggleNotes: () => void;
     disabled: boolean;
+    remainingHints: number | null;
+    remainingDigitCounts: RemainingDigitCounts;
 }
 
 const DIGITS: Digit[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -26,12 +29,41 @@ const btnBase: React.CSSProperties = {
     color: 'var(--color-given)',
     transition: 'background 0.1s',
     border: '2px solid transparent',
+    position: 'relative',
 };
 
 const actionBtn: React.CSSProperties = {
     ...btnBase,
     fontSize: 'clamp(11px, 3vw, 15px)',
     fontWeight: '500',
+};
+
+const digitBadge: React.CSSProperties = {
+    position: 'absolute',
+    top: 3,
+    right: 3,
+    minWidth: 14,
+    height: 14,
+    padding: '0 3px',
+    borderRadius: 999,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'var(--color-selected)',
+    color: 'var(--color-primary)',
+    fontSize: 8,
+    fontWeight: '700',
+    lineHeight: 1,
+};
+
+const hintBadge: React.CSSProperties = {
+    ...digitBadge,
+    top: 5,
+    right: 5,
+    minWidth: 16,
+    height: 16,
+    padding: '0 4px',
+    fontSize: 9,
 };
 
 export function NumberPad({
@@ -43,7 +75,13 @@ export function NumberPad({
     notesMode,
     onToggleNotes,
     disabled,
+    remainingHints,
+    remainingDigitCounts,
 }: Props) {
+    const hintsUnavailable = remainingHints === 0;
+    const hintDisabled = disabled || hintsUnavailable;
+    const hintLabelSuffix = remainingHints === null ? '' : ` (${remainingHints} left)`;
+
     return (
         <div
             aria-label="Number pad"
@@ -62,12 +100,17 @@ export function NumberPad({
                 <button
                     key={d}
                     type="button"
-                    aria-label={`Place ${d}`}
-                    disabled={disabled}
+                    aria-label={`Place ${d} (${remainingDigitCounts[d]} left)`}
+                    disabled={disabled || remainingDigitCounts[d] === 0}
                     onClick={() => onDigit(d)}
-                    style={btnBase}
+                    style={{
+                        ...btnBase,
+                    }}
                 >
-                    {d}
+                    <span>{d}</span>
+                    <span aria-hidden="true" style={digitBadge}>
+                        {remainingDigitCounts[d]}
+                    </span>
                 </button>
             ))}
 
@@ -118,26 +161,35 @@ export function NumberPad({
 
                 <button
                     type="button"
-                    aria-label="Hint — highlight the next cell to fill"
-                    disabled={disabled}
+                    aria-label={`Hint — highlight the next cell to fill${hintLabelSuffix}`}
+                    disabled={hintDisabled}
                     onClick={onHintSelect}
                     style={actionBtn}
                 >
-                    Hint
+                    <span>Hint</span>
+                    {remainingHints !== null && (
+                        <span aria-hidden="true" style={hintBadge}>
+                            {remainingHints}
+                        </span>
+                    )}
                 </button>
 
                 <button
                     type="button"
-                    aria-label="Hint+ — fill the next cell with the correct digit"
-                    disabled={disabled}
+                    aria-label={`Hint+ — fill the next cell with the correct digit${hintLabelSuffix}`}
+                    disabled={hintDisabled}
                     onClick={onHintApply}
                     style={{
                         ...actionBtn,
-                        border: '2px solid var(--color-hint)',
-                        color: 'var(--color-hint)',
+                        color: 'var(--color-primary)',
                     }}
                 >
-                    Hint+
+                    <span>Hint+</span>
+                    {remainingHints !== null && (
+                        <span aria-hidden="true" style={hintBadge}>
+                            {remainingHints}
+                        </span>
+                    )}
                 </button>
             </div>
         </div>

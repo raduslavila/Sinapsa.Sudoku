@@ -456,6 +456,10 @@ describe('applyHint', () => {
         const g = pause(freshGame(), NOW);
         expect(applyHint(g).board).toEqual(g.board);
     });
+
+    it('increments hintsUsed when a hint is applied', () => {
+        expect(applyHint(freshGame()).hintsUsed).toBe(1);
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -478,6 +482,17 @@ describe('hintCell', () => {
     it('does not place a digit', () => {
         const g = hintCell(freshGame());
         expect(g.board[g.selectedIndex!]).toBe(0);
+    });
+
+    it('increments hintsUsed when a hint is revealed', () => {
+        expect(hintCell(freshGame()).hintsUsed).toBe(1);
+    });
+
+    it('does not consume another hint when re-requesting the same highlighted hint', () => {
+        const g0 = hintCell(freshGame());
+        const g1 = hintCell(g0);
+        expect(g1).toBe(g0);
+        expect(g1.hintsUsed).toBe(1);
     });
 
     it('is a no-op when game is paused', () => {

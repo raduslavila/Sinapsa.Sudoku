@@ -5,6 +5,7 @@ import { SudokuGrid } from '../components/SudokuGrid.tsx';
 import { NumberPad } from '../components/NumberPad.tsx';
 import { Timer } from '../components/Timer.tsx';
 import { MistakeCounter } from '../components/MistakeCounter.tsx';
+import { getRemainingDigitCounts } from '../components/numberPadCounts.ts';
 
 interface Props {
     game: GameState;
@@ -42,6 +43,9 @@ export function GameScreen({
     const isPaused = game.status === 'paused';
     const isOver = game.status === 'over' || game.status === 'won';
     const padDisabled = isPaused || isOver;
+    const remainingHints =
+        game.hintLimit === null ? null : Math.max(0, game.hintLimit - game.hintsUsed);
+    const remainingDigitCounts = getRemainingDigitCounts(game.board, game.puzzle.solution);
 
     const hintedIndices: ReadonlySet<number> =
         game.hintedIndex !== null ? new Set([game.hintedIndex]) : new Set();
@@ -220,6 +224,8 @@ export function GameScreen({
                     notesMode={game.notesMode}
                     onToggleNotes={onToggleNotes}
                     disabled={padDisabled}
+                    remainingHints={remainingHints}
+                    remainingDigitCounts={remainingDigitCounts}
                 />
 
                 {SHOW_AD_PLACEHOLDER && (

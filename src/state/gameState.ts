@@ -298,7 +298,16 @@ export function hintCell(state: GameState): GameState {
     const hint = getHint(state.board, state.puzzle.solution);
     if (hint === null) return state;
 
-    return { ...state, selectedIndex: hint.index, hintedIndex: hint.index };
+    if (state.hintedIndex === hint.index && state.selectedIndex === hint.index) {
+        return state;
+    }
+
+    return {
+        ...state,
+        selectedIndex: hint.index,
+        hintedIndex: hint.index,
+        hintsUsed: state.hintsUsed + 1,
+    };
 }
 
 /**

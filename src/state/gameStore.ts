@@ -75,7 +75,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const config = getDifficultyConfig(difficultyId);
         const { mistakeLimitOverrides, hintLimitOverrides } = useSettingsStore.getState();
         const mistakeLimit = effectiveMistakeLimit(mistakeLimitOverrides, difficultyId, config.defaultMistakeLimit);
-        const hintLimit = effectiveHintLimit(hintLimitOverrides, difficultyId);
+        const hintLimit = effectiveHintLimit(hintLimitOverrides, difficultyId, config.defaultHintLimit);
         const puzzle = generatePuzzle(seed, difficultyId);
         const next = createGame(puzzle, mistakeLimit, Date.now(), hintLimit);
         set({ game: next });

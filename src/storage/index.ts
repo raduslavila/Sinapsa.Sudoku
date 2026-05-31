@@ -4,6 +4,7 @@ export {
     deleteActiveGame,
     saveCompletedGame,
     loadCompletedGames,
+    clearCompletedGames,
     loadSettings,
     saveSettings,
     clearAllData,

@@ -234,6 +234,16 @@ export async function loadCompletedGames(): Promise<PersistedCompletedGame[]> {
     }
 }
 
+/** Clears completed game summaries while preserving the active game and settings. */
+export async function clearCompletedGames(): Promise<void> {
+    try {
+        const db = await getDb();
+        await db.clear('completedGames');
+    } catch {
+        // Ignore
+    }
+}
+
 /** Clears all stored data. Useful for testing or a "reset all" settings action. */
 export async function clearAllData(): Promise<void> {
     try {
