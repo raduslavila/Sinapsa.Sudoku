@@ -30,15 +30,15 @@
 - ✅ 10 configurable levels.
 - ✅ Generator tests.
 
-## Milestone 3 — Game state
+## ✅ Milestone 3 — Game state
 
-- Game state model.
-- Move application.
-- Notes.
-- Mistakes.
-- Undo/redo.
-- Win/game-over detection.
-- Store tests.
+- ✅ Game state model.
+- ✅ Move application.
+- ✅ Notes.
+- ✅ Mistakes.
+- ✅ Undo/redo.
+- ✅ Win/game-over detection.
+- ✅ Store tests.
 
 ## Milestone 4 — Basic playable UI
 
