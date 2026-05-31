@@ -87,7 +87,18 @@
 - ✅ Add Capacitor Android (`cap add android`).
 - ✅ Configure app metadata (`capacitor.config.ts` — appId, appName, webDir).
 - ✅ Build web app and sync assets into Android project (`cap sync android`).
-- ⏳ Prepare signed AAB (Play Store release — future step).
+- ✅ GitHub Actions release workflow — signed APK + AAB on tag push.
+
+## Milestone 7.1 — App identity and visual polish
+
+- App icon (adaptive icon — foreground + background layers).
+- Splash screen.
+- App name and short description localisation (`strings.xml`).
+- Android status bar color and window background color.
+- Web app favicon and `<title>`.
+- `manifest.webmanifest` for PWA (name, icons, theme_color, background_color).
+- Meta tags (`og:title`, `og:description`, `og:image`) for link previews.
+- Review and finalize color palette (primary, surface, accent) for both light and dark themes.
 
 ## Milestone 8 — Play Games bridge stub
 
