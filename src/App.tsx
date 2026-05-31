@@ -43,8 +43,8 @@ export default function App() {
   // When game returns to idle (Home pressed), reload saved game and reset to home.
   useEffect(() => {
     if (game.status !== 'idle') return;
-    setIdleScreen('home');
     loadActiveGame().then((saved) => {
+      setIdleScreen('home');
       setPendingSave(saved ?? null);
     }).catch(() => {/* ignore */ });
   }, [game.status]);

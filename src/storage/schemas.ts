@@ -63,6 +63,7 @@ export const settingsSchema = z.object({
     schemaVersion: z.number().int().positive(),
     updatedAt: z.number().int(),
     theme: z.enum(['light', 'dark', 'system']),
+    palette: z.string().optional(),
     mistakeLimitOverrides: z.record(z.string(), z.number().int().positive().nullable()),
     hintLimitOverrides: z.record(z.string(), z.number().int().positive().nullable()),
 });

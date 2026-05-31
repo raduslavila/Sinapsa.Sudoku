@@ -53,7 +53,6 @@ export function GameScreen({
                 flexDirection: 'column',
                 alignItems: 'center',
                 padding: '12px 8px 0',
-                gap: 12,
                 width: '100%',
             }}
         >
@@ -70,7 +69,15 @@ export function GameScreen({
                     type="button"
                     aria-label="Back to home"
                     onClick={onHome}
-                    style={{ fontSize: 14, color: 'var(--color-primary)', fontWeight: 600, padding: 4 }}
+                    style={{
+                        fontSize: 13,
+                        color: 'var(--color-primary)',
+                        fontWeight: 600,
+                        padding: '5px 12px',
+                        borderRadius: 6,
+                        background: 'var(--color-selected)',
+                        border: '1.5px solid var(--color-primary)',
+                    }}
                 >
                     Home
                 </button>
@@ -82,7 +89,16 @@ export function GameScreen({
                     aria-label={isPaused ? 'Resume game' : 'Pause game'}
                     onClick={isPaused ? onResume : onPause}
                     disabled={isOver}
-                    style={{ fontSize: 14, color: 'var(--color-primary)', fontWeight: 600, padding: 4 }}
+                    style={{
+                        fontSize: 13,
+                        color: isPaused ? 'var(--color-bg)' : 'var(--color-primary)',
+                        fontWeight: 600,
+                        padding: '5px 12px',
+                        borderRadius: 6,
+                        background: isPaused ? 'var(--color-primary)' : 'var(--color-selected)',
+                        border: '1.5px solid var(--color-primary)',
+                        opacity: isOver ? 0.4 : 1,
+                    }}
                 >
                     {isPaused ? 'Resume' : 'Pause'}
                 </button>
@@ -101,106 +117,129 @@ export function GameScreen({
                 <Timer game={game} status={game.status} />
             </div>
 
-            {game.status === 'won' && (
+            {/* Grid area — fills remaining space and centers content vertically */}
+            <div
+                style={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    width: '100%',
+                    minHeight: 0,
+                }}
+            >
+                {game.status === 'won' && (
+                    <div
+                        role="alert"
+                        style={{
+                            width: '100%',
+                            maxWidth: GRID_WIDTH,
+                            background: '#d4f5e4',
+                            border: '1.5px solid #2b7a45',
+                            borderRadius: 8,
+                            padding: '10px 16px',
+                            textAlign: 'center',
+                            fontWeight: 600,
+                            color: '#2b7a45',
+                        }}
+                    >
+                        Puzzle solved!
+                    </div>
+                )}
+
+                {game.status === 'over' && (
+                    <div
+                        role="alert"
+                        style={{
+                            width: '100%',
+                            maxWidth: GRID_WIDTH,
+                            background: '#fde8e8',
+                            border: '1.5px solid var(--color-wrong)',
+                            borderRadius: 8,
+                            padding: '10px 16px',
+                            textAlign: 'center',
+                            fontWeight: 600,
+                            color: 'var(--color-wrong)',
+                        }}
+                    >
+                        Game over - too many mistakes
+                    </div>
+                )}
+
+                {isPaused ? (
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: GRID_WIDTH,
+                            height: GRID_WIDTH,
+                            background: 'rgba(200,200,200,0.5)',
+                            borderRadius: 4,
+                            fontWeight: 600,
+                            fontSize: 20,
+                            color: '#555',
+                        }}
+                    >
+                        Paused
+                    </div>
+                ) : (
+                    <SudokuGrid
+                        board={game.board}
+                        solution={game.puzzle.solution}
+                        givens={game.puzzle.givens}
+                        notes={game.notes}
+                        selectedIndex={game.selectedIndex}
+                        hintedIndices={hintedIndices}
+                        onSelectCell={onSelectCell}
+                        onDigitInput={onDigitInput}
+                        onClear={onClear}
+                    />
+                )}
+            </div>
+
+            <div
+                style={{
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 8,
+                    paddingBottom: 8,
+                }}
+            >
+                <NumberPad
+                    onDigit={onDigitInput}
+                    onClear={onClear}
+                    onUndo={onUndo}
+                    onHintSelect={onHintSelect}
+                    onHintApply={onHintApply}
+                    notesMode={game.notesMode}
+                    onToggleNotes={onToggleNotes}
+                    disabled={padDisabled}
+                />
+
                 <div
-                    role="alert"
+                    aria-hidden="true"
                     style={{
                         width: '100%',
                         maxWidth: GRID_WIDTH,
-                        background: '#d4f5e4',
-                        border: '1.5px solid #2b7a45',
-                        borderRadius: 8,
-                        padding: '10px 16px',
-                        textAlign: 'center',
-                        fontWeight: 600,
-                        color: '#2b7a45',
-                    }}
-                >
-                    Puzzle solved!
-                </div>
-            )}
-
-            {game.status === 'over' && (
-                <div
-                    role="alert"
-                    style={{
-                        width: '100%',
-                        maxWidth: GRID_WIDTH,
-                        background: '#fde8e8',
-                        border: '1.5px solid var(--color-wrong)',
-                        borderRadius: 8,
-                        padding: '10px 16px',
-                        textAlign: 'center',
-                        fontWeight: 600,
-                        color: 'var(--color-wrong)',
-                    }}
-                >
-                    Game over - too many mistakes
-                </div>
-            )}
-
-            {isPaused ? (
-                <div
-                    style={{
+                        margin: '0 auto',
+                        height: 60,
+                        flexShrink: 0,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: GRID_WIDTH,
-                        height: GRID_WIDTH,
-                        background: 'rgba(200,200,200,0.5)',
-                        borderRadius: 4,
-                        fontWeight: 600,
-                        fontSize: 20,
-                        color: '#555',
+                        border: '1.5px dashed var(--color-border)',
+                        borderRadius: 6,
+                        color: '#aaa',
+                        fontSize: 12,
+                        letterSpacing: 1,
                     }}
                 >
-                    Paused
+                    AD
                 </div>
-            ) : (
-                <SudokuGrid
-                    board={game.board}
-                    solution={game.puzzle.solution}
-                    givens={game.puzzle.givens}
-                    notes={game.notes}
-                    selectedIndex={game.selectedIndex}
-                    hintedIndices={hintedIndices}
-                    onSelectCell={onSelectCell}
-                    onDigitInput={onDigitInput}
-                    onClear={onClear}
-                />
-            )}
-
-            <NumberPad
-                onDigit={onDigitInput}
-                onClear={onClear}
-                onUndo={onUndo}
-                onHintSelect={onHintSelect}
-                onHintApply={onHintApply}
-                notesMode={game.notesMode}
-                onToggleNotes={onToggleNotes}
-                disabled={padDisabled}
-            />
-
-            <div
-                aria-hidden="true"
-                style={{
-                    marginTop: 'auto',
-                    width: '100%',
-                    maxWidth: GRID_WIDTH,
-                    height: 60,
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '1.5px dashed var(--color-border)',
-                    borderRadius: 6,
-                    color: '#aaa',
-                    fontSize: 12,
-                    letterSpacing: 1,
-                    marginBottom: 8,
-                }}
-            >
-                AD
             </div>
         </main>
     );

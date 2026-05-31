@@ -9,8 +9,35 @@ import { loadSettings, saveSettings } from '../storage/index.ts';
 
 export type Theme = 'light' | 'dark' | 'system';
 
+export type PaletteId =
+    | 'electric-blue'
+    | 'midnight-purple'
+    | 'forest-green'
+    | 'sunset-orange'
+    | 'rose-gold'
+    | 'obsidian'
+    | 'arctic';
+
+export interface PaletteEntry {
+    readonly id: PaletteId;
+    readonly label: string;
+    readonly lightPrimary: string;
+    readonly accent: string;
+}
+
+export const PALETTES: readonly PaletteEntry[] = [
+    { id: 'electric-blue', label: 'Electric Blue', lightPrimary: '#1a6fc4', accent: '#4dd8ff' },
+    { id: 'midnight-purple', label: 'Midnight Purple', lightPrimary: '#7c3aed', accent: '#c084fc' },
+    { id: 'forest-green', label: 'Forest Green', lightPrimary: '#16a34a', accent: '#86efac' },
+    { id: 'sunset-orange', label: 'Sunset Orange', lightPrimary: '#ea6c00', accent: '#fbbf24' },
+    { id: 'rose-gold', label: 'Rose Gold', lightPrimary: '#db2777', accent: '#fb7185' },
+    { id: 'obsidian', label: 'Obsidian', lightPrimary: '#374151', accent: '#9ca3af' },
+    { id: 'arctic', label: 'Arctic', lightPrimary: '#0891b2', accent: '#67e8f9' },
+];
+
 export interface SettingsState {
     readonly theme: Theme;
+    readonly palette: PaletteId;
     /** Per-difficulty mistake limit. undefined key = use difficulty default. null = unlimited. */
     readonly mistakeLimitOverrides: Partial<Record<DifficultyId, number | null>>;
     /** Per-difficulty hint limit per game. undefined key = unlimited. null = unlimited. */
@@ -21,6 +48,7 @@ interface SettingsStore extends SettingsState {
     /** Load settings from IndexedDB. Call once on app mount. */
     init: () => Promise<void>;
     setTheme: (theme: Theme) => void;
+    setPalette: (palette: PaletteId) => void;
     /** Set mistake limit for a difficulty. Pass undefined to reset to default. */
     setMistakeLimit: (difficultyId: DifficultyId, limit: number | null | undefined) => void;
     /** Set hint limit for a difficulty. Pass undefined to reset to unlimited. */
@@ -33,6 +61,7 @@ interface SettingsStore extends SettingsState {
 
 const DEFAULT_STATE: SettingsState = {
     theme: 'system',
+    palette: 'electric-blue',
     mistakeLimitOverrides: {},
     hintLimitOverrides: {},
 };
@@ -50,6 +79,11 @@ function applyThemeToDOM(theme: Theme): void {
     }
 }
 
+function applyPaletteToDOM(palette: PaletteId): void {
+    if (typeof document === 'undefined') return; // SSR / test guard
+    document.documentElement.dataset.palette = palette;
+}
+
 // ---------------------------------------------------------------------------
 // Persistence helpers
 // ---------------------------------------------------------------------------
@@ -59,6 +93,7 @@ function persist(state: SettingsState): void {
         schemaVersion: CURRENT_SCHEMA_VERSION,
         updatedAt: Date.now(),
         theme: state.theme,
+        palette: state.palette,
         mistakeLimitOverrides: Object.fromEntries(
             Object.entries(state.mistakeLimitOverrides).map(([k, v]) => [k, v ?? null])
         ) as Record<string, number | null>,
@@ -93,14 +128,22 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         }
 
         const theme = saved.theme;
+        const palette = (saved.palette as PaletteId | undefined) ?? 'electric-blue';
         applyThemeToDOM(theme);
-        set({ theme, mistakeLimitOverrides, hintLimitOverrides });
+        applyPaletteToDOM(palette);
+        set({ theme, palette, mistakeLimitOverrides, hintLimitOverrides });
     },
 
     setTheme: (theme) => {
         applyThemeToDOM(theme);
         set({ theme });
         persist({ ...get(), theme });
+    },
+
+    setPalette: (palette) => {
+        applyPaletteToDOM(palette);
+        set({ palette });
+        persist({ ...get(), palette });
     },
 
     setMistakeLimit: (difficultyId, limit) => {

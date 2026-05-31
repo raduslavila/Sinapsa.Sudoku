@@ -49,6 +49,7 @@ export interface PersistedSettings {
     readonly schemaVersion: number;
     readonly updatedAt: number;
     readonly theme: 'light' | 'dark' | 'system';
+    readonly palette?: string;
     /** Per-difficulty mistake limit overrides. Key is DifficultyId as string. */
     readonly mistakeLimitOverrides: Readonly<Record<string, number | null>>;
     /** Per-difficulty hint limit overrides. Key is DifficultyId as string. null = unlimited. */

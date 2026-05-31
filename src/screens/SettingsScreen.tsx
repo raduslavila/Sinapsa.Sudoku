@@ -1,5 +1,6 @@
 import { useSettingsStore } from '../state/settingsStore.ts';
-import type { Theme } from '../state/settingsStore.ts';
+import type { Theme, PaletteId, PaletteEntry } from '../state/settingsStore.ts';
+import { PALETTES } from '../state/settingsStore.ts';
 import { DIFFICULTIES } from '../config/difficulties.ts';
 import type { DifficultyId } from '../engine/types.ts';
 
@@ -10,6 +11,77 @@ interface Props {
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
+
+function PaletteSwatch({
+    entry,
+    current,
+    onSelect,
+}: {
+    entry: PaletteEntry;
+    current: PaletteId;
+    onSelect: (id: PaletteId) => void;
+}) {
+    const active = entry.id === current;
+    return (
+        <button
+            type="button"
+            onClick={() => onSelect(entry.id)}
+            aria-label={entry.label}
+            aria-pressed={active}
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 5,
+                padding: '6px 2px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                flex: 1,
+            }}
+        >
+            <div
+                style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 10,
+                    background: entry.lightPrimary,
+                    outline: active ? `3px solid ${entry.lightPrimary}` : '3px solid transparent',
+                    outlineOffset: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: active ? '0 2px 8px rgba(0,0,0,0.25)' : '0 1px 3px rgba(0,0,0,0.12)',
+                    transition: 'outline 0.15s, box-shadow 0.15s',
+                }}
+            >
+                <div
+                    style={{
+                        width: 14,
+                        height: 14,
+                        borderRadius: '50%',
+                        background: entry.accent,
+                        border: '2px solid rgba(255,255,255,0.7)',
+                    }}
+                />
+            </div>
+            <span
+                style={{
+                    fontSize: 9,
+                    color: 'var(--color-given)',
+                    textAlign: 'center',
+                    lineHeight: 1.2,
+                    fontWeight: active ? 700 : 400,
+                    opacity: active ? 1 : 0.7,
+                    maxWidth: 44,
+                    wordBreak: 'break-word',
+                }}
+            >
+                {entry.label}
+            </span>
+        </button>
+    );
+}
 
 function ThemeButton({
     label,
@@ -117,9 +189,11 @@ function LimitInput({
 
 export function SettingsScreen({ onBack }: Props) {
     const theme = useSettingsStore((s) => s.theme);
+    const palette = useSettingsStore((s) => s.palette);
     const mistakeLimitOverrides = useSettingsStore((s) => s.mistakeLimitOverrides);
     const hintLimitOverrides = useSettingsStore((s) => s.hintLimitOverrides);
     const setTheme = useSettingsStore((s) => s.setTheme);
+    const setPalette = useSettingsStore((s) => s.setPalette);
     const setMistakeLimit = useSettingsStore((s) => s.setMistakeLimit);
     const setHintLimit = useSettingsStore((s) => s.setHintLimit);
 
@@ -162,6 +236,21 @@ export function SettingsScreen({ onBack }: Props) {
                     Settings
                 </h2>
             </div>
+
+            {/* Color Palette */}
+            <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>Color Palette</h3>
+                <div style={{ display: 'flex', gap: 2 }}>
+                    {PALETTES.map((entry) => (
+                        <PaletteSwatch
+                            key={entry.id}
+                            entry={entry}
+                            current={palette}
+                            onSelect={setPalette}
+                        />
+                    ))}
+                </div>
+            </section>
 
             {/* Theme */}
             <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
