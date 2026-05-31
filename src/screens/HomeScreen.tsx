@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Logo } from '../assets/Logo.tsx';
 import type { DifficultyId } from '../engine/types.ts';
 import { DIFFICULTIES } from '../config/difficulties.ts';
 
@@ -38,16 +39,7 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                 gap: 24,
             }}
         >
-            <h1
-                style={{
-                    fontSize: 'clamp(28px, 8vw, 40px)',
-                    fontWeight: 700,
-                    letterSpacing: -1,
-                    color: 'var(--color-primary)',
-                }}
-            >
-                Sudoku
-            </h1>
+            <Logo size={240} />
 
             {/* Continue Game card */}
             {savedGame && (

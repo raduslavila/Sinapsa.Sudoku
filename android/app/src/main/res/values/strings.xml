@@ -4,4 +4,5 @@
     <string name="title_activity_main">Sudoku Synapse</string>
     <string name="package_name">ro.slavila.sudokuapp</string>
     <string name="custom_url_scheme">ro.slavila.sudokuapp</string>
+    <string name="app_description">10 difficulty levels. Offline-first. Think fast.</string>
 </resources>

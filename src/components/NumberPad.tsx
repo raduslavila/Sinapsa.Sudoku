@@ -15,7 +15,7 @@ const DIGITS: Digit[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const btnBase: React.CSSProperties = {
     width: '100%',
-    aspectRatio: '1',
+    aspectRatio: '1 / 1.35',
     borderRadius: 8,
     background: 'var(--color-btn-bg)',
     fontSize: 'clamp(18px, 5vw, 28px)',
