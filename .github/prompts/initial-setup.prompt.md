@@ -1,6 +1,6 @@
-# Initial prompt to give Claude Code
+# Initial setup prompt for Copilot Agent
 
-You are inside a new empty repository. Read `CLAUDE.md`, `AGENTS.md`, and the files under `.claude/skills`.
+You are inside a new empty repository. Read `CLAUDE.md`, `AGENTS.md`, and the files under `.github/skills`.
 
 Build the Sudoku app according to the repository instructions.
 
