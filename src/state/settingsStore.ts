@@ -42,6 +42,8 @@ export interface SettingsState {
     readonly mistakeLimitOverrides: Partial<Record<DifficultyId, number | null>>;
     /** Per-difficulty hint limit per game. undefined key = unlimited. null = unlimited. */
     readonly hintLimitOverrides: Partial<Record<DifficultyId, number | null>>;
+    /** Developer-only: highlight note digits that conflict with placed values. */
+    readonly showWrongNoteConflicts: boolean;
 }
 
 interface SettingsStore extends SettingsState {
@@ -53,7 +55,10 @@ interface SettingsStore extends SettingsState {
     setMistakeLimit: (difficultyId: DifficultyId, limit: number | null | undefined) => void;
     /** Set hint limit for a difficulty. Pass undefined to reset to unlimited. */
     setHintLimit: (difficultyId: DifficultyId, limit: number | null | undefined) => void;
+    setShowWrongNoteConflicts: (enabled: boolean) => void;
 }
+
+export const DEV_SETTINGS_ENABLED = import.meta.env.DEV;
 
 // ---------------------------------------------------------------------------
 // Default state
@@ -64,6 +69,7 @@ const DEFAULT_STATE: SettingsState = {
     palette: 'electric-blue',
     mistakeLimitOverrides: {},
     hintLimitOverrides: {},
+    showWrongNoteConflicts: false,
 };
 
 // ---------------------------------------------------------------------------
@@ -100,6 +106,7 @@ function persist(state: SettingsState): void {
         hintLimitOverrides: Object.fromEntries(
             Object.entries(state.hintLimitOverrides).map(([k, v]) => [k, v ?? null])
         ) as Record<string, number | null>,
+        showWrongNoteConflicts: state.showWrongNoteConflicts,
     };
     void saveSettings(record);
 }
@@ -129,9 +136,10 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
 
         const theme = saved.theme;
         const palette = (saved.palette as PaletteId | undefined) ?? 'electric-blue';
+        const showWrongNoteConflicts = saved.showWrongNoteConflicts ?? false;
         applyThemeToDOM(theme);
         applyPaletteToDOM(palette);
-        set({ theme, palette, mistakeLimitOverrides, hintLimitOverrides });
+        set({ theme, palette, mistakeLimitOverrides, hintLimitOverrides, showWrongNoteConflicts });
     },
 
     setTheme: (theme) => {
@@ -166,6 +174,11 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         }
         set({ hintLimitOverrides: next });
         persist({ ...get(), hintLimitOverrides: next });
+    },
+
+    setShowWrongNoteConflicts: (enabled) => {
+        set({ showWrongNoteConflicts: enabled });
+        persist({ ...get(), showWrongNoteConflicts: enabled });
     },
 }));
 

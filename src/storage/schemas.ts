@@ -66,4 +66,5 @@ export const settingsSchema = z.object({
     palette: z.string().optional(),
     mistakeLimitOverrides: z.record(z.string(), z.number().int().positive().nullable()),
     hintLimitOverrides: z.record(z.string(), z.number().int().positive().nullable()),
+    showWrongNoteConflicts: z.boolean().optional(),
 });

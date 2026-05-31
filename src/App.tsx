@@ -39,9 +39,11 @@ export default function App() {
   const gameStatusRef = useRef(game.status);
   const idleScreenRef = useRef(idleScreen);
   const goHomeRef = useRef(goHome);
+  const pauseRef = useRef(pause);
   gameStatusRef.current = game.status;
   idleScreenRef.current = idleScreen;
   goHomeRef.current = goHome;
+  pauseRef.current = pause;
 
   // Init settings once on mount.
   useEffect(() => {
@@ -63,6 +65,21 @@ export default function App() {
       } else {
         // Already on HomeScreen — exit the app.
         void CapApp.exitApp();
+      }
+    }).then((h) => { handle = h; });
+
+    return () => {
+      void handle?.remove();
+    };
+  }, []);
+
+  // Pause the active game when the app leaves the foreground, including device lock.
+  useEffect(() => {
+    let handle: Awaited<ReturnType<typeof CapApp.addListener>> | null = null;
+
+    void CapApp.addListener('appStateChange', ({ isActive }) => {
+      if (!isActive && gameStatusRef.current === 'playing') {
+        pauseRef.current();
       }
     }).then((h) => { handle = h; });
 

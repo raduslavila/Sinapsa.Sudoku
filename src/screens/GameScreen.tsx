@@ -21,6 +21,7 @@ interface Props {
 }
 
 const GRID_WIDTH = 'calc(var(--cell-size) * 9 + 2px)';
+const SHOW_AD_PLACEHOLDER = false;
 
 export function GameScreen({
     game,
@@ -221,26 +222,28 @@ export function GameScreen({
                     disabled={padDisabled}
                 />
 
-                <div
-                    aria-hidden="true"
-                    style={{
-                        width: '100%',
-                        maxWidth: GRID_WIDTH,
-                        margin: '0 auto',
-                        height: 60,
-                        flexShrink: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        border: '1.5px dashed var(--color-border)',
-                        borderRadius: 6,
-                        color: '#aaa',
-                        fontSize: 12,
-                        letterSpacing: 1,
-                    }}
-                >
-                    AD
-                </div>
+                {SHOW_AD_PLACEHOLDER && (
+                    <div
+                        aria-hidden="true"
+                        style={{
+                            width: '100%',
+                            maxWidth: GRID_WIDTH,
+                            margin: '0 auto',
+                            height: 60,
+                            flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '1.5px dashed var(--color-border)',
+                            borderRadius: 6,
+                            color: '#aaa',
+                            fontSize: 12,
+                            letterSpacing: 1,
+                        }}
+                    >
+                        AD
+                    </div>
+                )}
             </div>
         </main>
     );

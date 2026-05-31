@@ -1,4 +1,4 @@
-import { useSettingsStore } from '../state/settingsStore.ts';
+import { DEV_SETTINGS_ENABLED, useSettingsStore } from '../state/settingsStore.ts';
 import type { Theme, PaletteId, PaletteEntry } from '../state/settingsStore.ts';
 import { PALETTES } from '../state/settingsStore.ts';
 import { DIFFICULTIES } from '../config/difficulties.ts';
@@ -192,10 +192,12 @@ export function SettingsScreen({ onBack }: Props) {
     const palette = useSettingsStore((s) => s.palette);
     const mistakeLimitOverrides = useSettingsStore((s) => s.mistakeLimitOverrides);
     const hintLimitOverrides = useSettingsStore((s) => s.hintLimitOverrides);
+    const showWrongNoteConflicts = useSettingsStore((s) => s.showWrongNoteConflicts);
     const setTheme = useSettingsStore((s) => s.setTheme);
     const setPalette = useSettingsStore((s) => s.setPalette);
     const setMistakeLimit = useSettingsStore((s) => s.setMistakeLimit);
     const setHintLimit = useSettingsStore((s) => s.setHintLimit);
+    const setShowWrongNoteConflicts = useSettingsStore((s) => s.setShowWrongNoteConflicts);
 
     return (
         <main
@@ -322,6 +324,40 @@ export function SettingsScreen({ onBack }: Props) {
                     );
                 })}
             </section>
+
+            {DEV_SETTINGS_ENABLED && (
+                <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>
+                        Advanced options
+                    </h3>
+                    <label
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: 12,
+                            padding: '12px 14px',
+                            background: 'var(--color-surface)',
+                            borderRadius: 10,
+                            border: '1px solid var(--color-border)',
+                            color: 'var(--color-given)',
+                        }}
+                    >
+                        <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <span style={{ fontSize: 14, fontWeight: 600 }}>Highlight wrong notes</span>
+                            <span style={{ fontSize: 12, color: '#888' }}>
+                                Colors note digits red when they conflict with placed values.
+                            </span>
+                        </span>
+                        <input
+                            type="checkbox"
+                            checked={showWrongNoteConflicts}
+                            onChange={(e) => setShowWrongNoteConflicts(e.target.checked)}
+                            aria-label="Highlight wrong notes"
+                        />
+                    </label>
+                </section>
+            )}
         </main>
     );
 }

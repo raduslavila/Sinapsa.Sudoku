@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { parseBoardString, serializeBoardArray, CURRENT_SCHEMA_VERSION } from './types.ts';
 import { isCompatibleSchemaVersion } from './migrations.ts';
-import { persistedGameSchema, persistedCompletedGameSchema } from './schemas.ts';
+import { persistedGameSchema, persistedCompletedGameSchema, settingsSchema } from './schemas.ts';
 import type { CellValue } from '../engine/types.ts';
 import { SOLVED_GRID, EASY_PUZZLE } from '../test/fixtures.ts';
 
@@ -183,5 +183,24 @@ describe('persistedCompletedGameSchema', () => {
 
     it('rejects negative elapsedMs', () => {
         expect(persistedCompletedGameSchema.safeParse({ ...validCompleted, elapsedMs: -1 }).success).toBe(false);
+    });
+});
+
+describe('settingsSchema', () => {
+    const validSettings = {
+        schemaVersion: 1,
+        updatedAt: Date.now(),
+        theme: 'system' as const,
+        palette: 'electric-blue',
+        mistakeLimitOverrides: {},
+        hintLimitOverrides: {},
+    };
+
+    it('accepts a valid settings record without developer-only fields', () => {
+        expect(settingsSchema.safeParse(validSettings).success).toBe(true);
+    });
+
+    it('accepts the optional wrong-note toggle', () => {
+        expect(settingsSchema.safeParse({ ...validSettings, showWrongNoteConflicts: true }).success).toBe(true);
     });
 });

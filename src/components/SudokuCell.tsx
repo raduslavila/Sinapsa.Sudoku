@@ -1,4 +1,10 @@
+import type { CSSProperties } from 'react';
 import type { CellValue, Digit } from '../engine/types.ts';
+
+interface CompletionAnimation {
+    readonly token: number;
+    readonly delayMs: number;
+}
 
 interface Props {
     index: number;
@@ -9,6 +15,7 @@ interface Props {
     isConflict: boolean;
     isWrong: boolean;
     isHinted: boolean;
+    completionAnimation: CompletionAnimation | null;
     notes: ReadonlySet<Digit>;
     conflictingNotes: ReadonlySet<Digit>;
     onClick: (index: number) => void;
@@ -25,6 +32,7 @@ export function SudokuCell({
     isConflict,
     isWrong,
     isHinted,
+    completionAnimation,
     notes,
     conflictingNotes,
     onClick,
@@ -50,39 +58,47 @@ export function SudokuCell({
     const borderTop = row === 0 ? '2px solid #888' : undefined;
     const borderRightFinal = col === 8 ? '2px solid #888' : borderRight;
     const borderBottomFinal = row === 8 ? '2px solid #888' : borderBottom;
+    const className =
+        completionAnimation === null
+            ? 'sudoku-cell'
+            : `sudoku-cell ${completionAnimation.token % 2 === 0 ? 'sudoku-cell--complete-a' : 'sudoku-cell--complete-b'}`;
+    const style = {
+        width: 'var(--cell-size)',
+        height: 'var(--cell-size)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: bg,
+        borderTop: borderTop ?? '1px solid var(--color-border)',
+        borderLeft: borderLeft ?? '1px solid var(--color-border)',
+        borderRight: borderRightFinal,
+        borderBottom: borderBottomFinal,
+        fontSize: value !== 0 ? 'calc(var(--cell-size) * 0.52)' : 'calc(var(--cell-size) * 0.26)',
+        fontWeight: isGiven ? '700' : '400',
+        color: textColor,
+        position: 'relative',
+        padding: 0,
+        outline: isSelected
+            ? '2px solid var(--color-primary)'
+            : isHinted && value === 0
+                ? '2px solid var(--color-hint)'
+                : undefined,
+        outlineOffset: '-2px',
+        boxShadow: isHinted && value === 0 ? 'inset 0 0 0 2px var(--color-hint)' : undefined,
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        '--cell-base-bg': bg,
+        '--unit-complete-delay': `${completionAnimation?.delayMs ?? 0}ms`,
+    } as CSSProperties;
 
     return (
         <button
+            className={className}
             type="button"
             aria-label={`Row ${row + 1}, Column ${col + 1}${value !== 0 ? `, value ${value}` : ', empty'}`}
             aria-pressed={isSelected}
             onClick={() => onClick(index)}
-            style={{
-                width: 'var(--cell-size)',
-                height: 'var(--cell-size)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: bg,
-                borderTop: borderTop ?? '1px solid var(--color-border)',
-                borderLeft: borderLeft ?? '1px solid var(--color-border)',
-                borderRight: borderRightFinal,
-                borderBottom: borderBottomFinal,
-                fontSize: value !== 0 ? 'calc(var(--cell-size) * 0.52)' : 'calc(var(--cell-size) * 0.26)',
-                fontWeight: isGiven ? '700' : '400',
-                color: textColor,
-                position: 'relative',
-                padding: 0,
-                outline: isSelected
-                    ? '2px solid var(--color-primary)'
-                    : isHinted && value === 0
-                        ? '2px solid var(--color-hint)'
-                        : undefined,
-                outlineOffset: '-2px',
-                boxShadow: isHinted && value === 0 ? 'inset 0 0 0 2px var(--color-hint)' : undefined,
-                userSelect: 'none',
-                WebkitUserSelect: 'none',
-            }}
+            style={style}
         >
             {value !== 0 ? (
                 <span>{value}</span>

@@ -54,6 +54,8 @@ export interface PersistedSettings {
     readonly mistakeLimitOverrides: Readonly<Record<string, number | null>>;
     /** Per-difficulty hint limit overrides. Key is DifficultyId as string. null = unlimited. */
     readonly hintLimitOverrides: Readonly<Record<string, number | null>>;
+    /** Developer-only: highlight note digits that conflict with placed values. */
+    readonly showWrongNoteConflicts?: boolean;
 }
 
 /** A completed game summary stored in IndexedDB. */

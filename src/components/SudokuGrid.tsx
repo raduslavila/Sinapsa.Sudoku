@@ -1,7 +1,9 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CellValue, Digit } from '../engine/types.ts';
 import { getPeerIndices } from '../engine/grid.ts';
 import { SudokuCell } from './SudokuCell.tsx';
+import { getCompletionWaveDelays } from './unitCompletion.ts';
+import { DEV_SETTINGS_ENABLED, useSettingsStore } from '../state/settingsStore.ts';
 
 interface Props {
     board: readonly CellValue[];
@@ -13,6 +15,11 @@ interface Props {
     onSelectCell: (index: number) => void;
     onDigitInput: (digit: Digit) => void;
     onClear: () => void;
+}
+
+interface CompletionWaveState {
+    readonly token: number;
+    readonly delays: ReadonlyMap<number, number>;
 }
 
 function buildConflicts(board: readonly CellValue[]): Set<number> {
@@ -69,6 +76,12 @@ export function SudokuGrid({
 }: Props) {
     const peers = selectedIndex !== null ? new Set(getPeerIndices(selectedIndex)) : new Set<number>();
     const conflicts = buildConflicts(board);
+    const showWrongNoteConflicts = useSettingsStore(
+        (state) => DEV_SETTINGS_ENABLED && state.showWrongNoteConflicts,
+    );
+    const previousBoardRef = useRef(board);
+    const completionWaveTokenRef = useRef(0);
+    const [completionWave, setCompletionWave] = useState<CompletionWaveState | null>(null);
 
     const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
@@ -94,6 +107,19 @@ export function SudokuGrid({
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleKeyDown]);
 
+    useEffect(() => {
+        const delays = getCompletionWaveDelays(previousBoardRef.current, board, selectedIndex);
+
+        if (delays !== null) {
+            completionWaveTokenRef.current += 1;
+            setCompletionWave({ token: completionWaveTokenRef.current, delays });
+        } else if (previousBoardRef.current !== board) {
+            setCompletionWave(null);
+        }
+
+        previousBoardRef.current = board;
+    }, [board, selectedIndex]);
+
     return (
         <div
             role="grid"
@@ -108,6 +134,7 @@ export function SudokuGrid({
         >
             {board.map((value, i) => {
                 const cellNotes = notes.get(i) ?? new Set<Digit>();
+                const completionDelayMs = completionWave?.delays.get(i);
                 return (
                     <SudokuCell
                         key={i}
@@ -119,8 +146,17 @@ export function SudokuGrid({
                         isConflict={conflicts.has(i)}
                         isWrong={!givens.has(i) && value !== 0 && value !== solution[i]}
                         isHinted={hintedIndices.has(i)}
+                        completionAnimation={
+                            completionDelayMs === undefined || completionWave === null
+                                ? null
+                                : { token: completionWave.token, delayMs: completionDelayMs }
+                        }
                         notes={cellNotes}
-                        conflictingNotes={getConflictingNotes(board, cellNotes, i)}
+                        conflictingNotes={
+                            showWrongNoteConflicts
+                                ? getConflictingNotes(board, cellNotes, i)
+                                : new Set<Digit>()
+                        }
                         onClick={onSelectCell}
                     />
                 );
