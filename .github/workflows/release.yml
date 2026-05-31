@@ -38,6 +38,9 @@ jobs:
       - name: Sync Capacitor Android
         run: npx cap sync android
 
+      - name: Ensure Gradle wrapper is executable
+        run: chmod +x android/gradlew
+
       - name: Decode keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/sinapsa-sudoku.jks
