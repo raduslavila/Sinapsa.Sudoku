@@ -224,5 +224,11 @@ Google Play Games integration (sign-in, cloud save snapshots, achievements, lead
 
 ## License
 
-Private — all rights reserved.
+Copyright © 2026 Radu Slăvilă
+
+This project is licensed under the **GNU General Public License v3.0**.
+
+You are free to use, study, modify, and distribute this software, provided that any derivative work is also distributed under the same GPL v3 terms. Commercial use (including ad-supported or IAP-monetised builds) is permitted under GPL v3, but any distributed modifications must remain open source.
+
+See [LICENSE](LICENSE) for the full license text.
 
