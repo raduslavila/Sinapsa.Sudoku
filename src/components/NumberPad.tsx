@@ -40,8 +40,8 @@ const actionBtn: React.CSSProperties = {
 
 const digitBadge: React.CSSProperties = {
     position: 'absolute',
-    top: 3,
-    right: 3,
+    top: 1,
+    right: 1,
     minWidth: 14,
     height: 14,
     padding: '0 3px',
@@ -58,13 +58,37 @@ const digitBadge: React.CSSProperties = {
 
 const hintBadge: React.CSSProperties = {
     ...digitBadge,
-    top: 5,
-    right: 5,
+    top: 2,
+    right: 2,
     minWidth: 16,
     height: 16,
     padding: '0 4px',
     fontSize: 9,
 };
+
+function withDisabledStyle(
+    style: React.CSSProperties,
+    isDisabled: boolean,
+): React.CSSProperties {
+    if (!isDisabled) return style;
+    return {
+        ...style,
+        opacity: 0.45,
+        cursor: 'not-allowed',
+    };
+}
+
+function withDisabledBadgeStyle(
+    style: React.CSSProperties,
+    isDisabled: boolean,
+): React.CSSProperties {
+    if (!isDisabled) return style;
+    return {
+        ...style,
+        background: 'var(--color-border)',
+        color: '#888',
+    };
+}
 
 export function NumberPad({
     onDigit,
@@ -96,23 +120,24 @@ export function NumberPad({
             }}
         >
             {/* Digit row */}
-            {DIGITS.map((d) => (
-                <button
-                    key={d}
-                    type="button"
-                    aria-label={`Place ${d} (${remainingDigitCounts[d]} left)`}
-                    disabled={disabled || remainingDigitCounts[d] === 0}
-                    onClick={() => onDigit(d)}
-                    style={{
-                        ...btnBase,
-                    }}
-                >
-                    <span>{d}</span>
-                    <span aria-hidden="true" style={digitBadge}>
-                        {remainingDigitCounts[d]}
-                    </span>
-                </button>
-            ))}
+            {DIGITS.map((d) => {
+                const digitDisabled = disabled || remainingDigitCounts[d] === 0;
+                return (
+                    <button
+                        key={d}
+                        type="button"
+                        aria-label={`Place ${d} (${remainingDigitCounts[d]} left)`}
+                        disabled={digitDisabled}
+                        onClick={() => onDigit(d)}
+                        style={withDisabledStyle(btnBase, digitDisabled)}
+                    >
+                        <span>{d}</span>
+                        <span aria-hidden="true" style={withDisabledBadgeStyle(digitBadge, digitDisabled)}>
+                            {remainingDigitCounts[d]}
+                        </span>
+                    </button>
+                );
+            })}
 
             {/* Action row — 5 buttons spanning all 9 columns */}
             <div
@@ -128,7 +153,7 @@ export function NumberPad({
                     aria-label="Undo"
                     disabled={disabled}
                     onClick={onUndo}
-                    style={actionBtn}
+                    style={withDisabledStyle(actionBtn, disabled)}
                 >
                     Undo
                 </button>
@@ -138,7 +163,7 @@ export function NumberPad({
                     aria-label="Erase"
                     disabled={disabled}
                     onClick={onClear}
-                    style={actionBtn}
+                    style={withDisabledStyle(actionBtn, disabled)}
                 >
                     Erase
                 </button>
@@ -149,12 +174,15 @@ export function NumberPad({
                     aria-pressed={notesMode}
                     disabled={disabled}
                     onClick={onToggleNotes}
-                    style={{
-                        ...actionBtn,
-                        background: notesMode ? 'var(--color-selected)' : 'var(--color-btn-bg)',
-                        border: notesMode ? '2px solid var(--color-primary)' : '2px solid transparent',
-                        color: notesMode ? 'var(--color-primary)' : 'var(--color-given)',
-                    }}
+                    style={withDisabledStyle(
+                        {
+                            ...actionBtn,
+                            background: notesMode ? 'var(--color-selected)' : 'var(--color-btn-bg)',
+                            border: notesMode ? '2px solid var(--color-primary)' : '2px solid transparent',
+                            color: notesMode ? 'var(--color-primary)' : 'var(--color-given)',
+                        },
+                        disabled,
+                    )}
                 >
                     Notes
                 </button>
@@ -164,11 +192,11 @@ export function NumberPad({
                     aria-label={`Hint — highlight the next cell to fill${hintLabelSuffix}`}
                     disabled={hintDisabled}
                     onClick={onHintSelect}
-                    style={actionBtn}
+                    style={withDisabledStyle(actionBtn, hintDisabled)}
                 >
                     <span>Hint</span>
                     {remainingHints !== null && (
-                        <span aria-hidden="true" style={hintBadge}>
+                        <span aria-hidden="true" style={withDisabledBadgeStyle(hintBadge, hintDisabled)}>
                             {remainingHints}
                         </span>
                     )}
@@ -179,14 +207,17 @@ export function NumberPad({
                     aria-label={`Hint+ — fill the next cell with the correct digit${hintLabelSuffix}`}
                     disabled={hintDisabled}
                     onClick={onHintApply}
-                    style={{
-                        ...actionBtn,
-                        color: 'var(--color-primary)',
-                    }}
+                    style={withDisabledStyle(
+                        {
+                            ...actionBtn,
+                            color: 'var(--color-primary)',
+                        },
+                        hintDisabled,
+                    )}
                 >
                     <span>Hint+</span>
                     {remainingHints !== null && (
-                        <span aria-hidden="true" style={hintBadge}>
+                        <span aria-hidden="true" style={withDisabledBadgeStyle(hintBadge, hintDisabled)}>
                             {remainingHints}
                         </span>
                     )}
