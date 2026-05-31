@@ -20,4 +20,6 @@ export interface DifficultyRating {
 export interface Hint {
     readonly index: number;
     readonly digit: Digit;
+    readonly technique: 'full-house' | 'naked-single' | 'hidden-single' | 'fallback';
+    readonly reason: string;
 }

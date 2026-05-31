@@ -26,6 +26,8 @@ export interface GameState {
     readonly startedAt: number | null;
     /** Wall-clock ms at which the game was paused. */
     readonly pausedAt: number | null;
+    /** Cell index highlighted by the Hint button (but not yet filled). null = none. */
+    readonly hintedIndex: number | null;
 }
 
 export const IDLE_STATE: GameState = {
@@ -42,6 +44,7 @@ export const IDLE_STATE: GameState = {
     elapsedMs: 0,
     startedAt: null,
     pausedAt: null,
+    hintedIndex: null,
 };
 
 // ---------------------------------------------------------------------------
@@ -112,6 +115,7 @@ export function createGame(
         elapsedMs: 0,
         startedAt: now,
         pausedAt: null,
+        hintedIndex: null,
     };
 }
 
@@ -119,7 +123,7 @@ export function createGame(
 export function selectCell(state: GameState, index: number): GameState {
     if (state.status !== 'playing' && state.status !== 'paused') return state;
     if (index < 0 || index > 80) return state;
-    return { ...state, selectedIndex: index };
+    return { ...state, selectedIndex: index, hintedIndex: null };
 }
 
 /**
@@ -164,6 +168,7 @@ export function placeDigit(state: GameState, digit: Digit): GameState {
         notes,
         mistakeCount,
         status,
+        hintedIndex: null,
     };
 }
 
@@ -184,7 +189,7 @@ export function clearCell(state: GameState): GameState {
     const notes = cloneNotes(state.notes);
     notes.delete(state.selectedIndex);
 
-    return { ...state, ...withUndo(state), board, notes };
+    return { ...state, ...withUndo(state), board, notes, hintedIndex: null };
 }
 
 /** Toggles a pencil-mark digit in the selected empty cell. */
@@ -210,7 +215,7 @@ export function toggleNote(state: GameState, digit: Digit): GameState {
         notes.set(state.selectedIndex, cellNotes);
     }
 
-    return { ...state, ...withUndo(state), notes };
+    return { ...state, ...withUndo(state), notes, hintedIndex: null };
 }
 
 /** Switches notes mode on or off. */
@@ -273,6 +278,20 @@ export function resume(state: GameState, now: number): GameState {
 }
 
 /**
+ * Highlights the first empty cell as a hint without placing a digit.
+ * Sets selectedIndex and hintedIndex to that cell.
+ */
+export function hintCell(state: GameState): GameState {
+    if (state.status !== 'playing') return state;
+    if (state.puzzle === null) return state;
+
+    const hint = getHint(state.board, state.puzzle.solution);
+    if (hint === null) return state;
+
+    return { ...state, selectedIndex: hint.index, hintedIndex: hint.index };
+}
+
+/**
  * Reveals the simplest available hint (first empty cell from the solution).
  * Internally selects the cell and places the correct digit.
  */
@@ -283,7 +302,7 @@ export function applyHint(state: GameState): GameState {
     const hint = getHint(state.board, state.puzzle.solution);
     if (hint === null) return state;
 
-    return placeDigit(selectCell(state, hint.index), hint.digit);
+    return { ...placeDigit(selectCell(state, hint.index), hint.digit), hintedIndex: null };
 }
 
 /** Returns total elapsed milliseconds at the given wall-clock time. */

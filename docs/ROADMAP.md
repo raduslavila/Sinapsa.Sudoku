@@ -40,16 +40,26 @@
 - ✅ Win/game-over detection.
 - ✅ Store tests.
 
-## Milestone 4 — Basic playable UI
+## ✅ Milestone 4 — Basic playable UI
 
-- Home screen.
-- Difficulty selector.
-- Game screen.
-- Sudoku grid.
-- Number pad.
-- Notes toggle.
-- Timer.
-- Mistake counter.
+- ✅ Home screen.
+- ✅ Difficulty selector.
+- ✅ Game screen.
+- ✅ Sudoku grid.
+- ✅ Number pad.
+- ✅ Notes toggle.
+- ✅ Timer.
+- ✅ Mistake counter.
+
+## Milestone 4.1 — Bug Fixes & UX Refinements
+
+- Notes toggle on/off fix.
+- Conflict-aware note digit coloring (red for digits already in peers).
+- Control panel and banners horizontal alignment fix.
+- Grid overflow fix (grid no longer exceeds container width).
+- Split Hint into Hint (highlight cell) and Hint+ (highlight + place digit).
+- `hintedIndex` tracked in game state; cleared on any player action.
+- Ad placeholder strip at bottom of game screen.
 
 ## Milestone 5 — Persistence
 
@@ -63,7 +73,8 @@
 
 - Settings screen.
 - Statistics screen.
-- Configurable mistake limits.
+- Configurable mistake limits per difficulty (with IAP extension hook for buying extra mistakes).
+- Configurable hint limits per difficulty (with IAP extension hook for buying extra hints or watching ads).
 - Theme setting.
 
 ## Milestone 7 — Android packaging

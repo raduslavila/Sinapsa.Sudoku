@@ -16,6 +16,7 @@ import {
     redo as redoAction,
     pause as pauseAction,
     resume as resumeAction,
+    hintCell as hintCellAction,
     applyHint as applyHintAction,
     getElapsedMs as getElapsedMsAction,
 } from './gameState.ts';
@@ -23,6 +24,7 @@ import {
 interface GameStore {
     game: GameState;
     startGame: (difficultyId: DifficultyId) => void;
+    goHome: () => void;
     selectCell: (index: number) => void;
     /** Routes to placeDigit or toggleNote depending on notesMode. */
     handleDigitInput: (digit: Digit) => void;
@@ -32,6 +34,7 @@ interface GameStore {
     redo: () => void;
     pause: () => void;
     resume: () => void;
+    hintCell: () => void;
     applyHint: () => void;
     getElapsedMs: () => number;
 }
@@ -44,6 +47,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const config = getDifficultyConfig(difficultyId);
         const puzzle = generatePuzzle(seed, difficultyId);
         set({ game: createGame(puzzle, config.defaultMistakeLimit, Date.now()) });
+    },
+
+    goHome: () => {
+        set({ game: IDLE_STATE });
     },
 
     selectCell: (index) => {
@@ -80,6 +87,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     resume: () => {
         set((s) => ({ game: resumeAction(s.game, Date.now()) }));
+    },
+
+    hintCell: () => {
+        set((s) => ({ game: hintCellAction(s.game) }));
     },
 
     applyHint: () => {

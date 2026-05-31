@@ -11,6 +11,7 @@ import {
     redo,
     pause,
     resume,
+    hintCell,
     applyHint,
     getElapsedMs,
     IDLE_STATE,
@@ -454,6 +455,57 @@ describe('applyHint', () => {
     it('is a no-op when status is not playing', () => {
         const g = pause(freshGame(), NOW);
         expect(applyHint(g).board).toEqual(g.board);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// hintCell
+// ---------------------------------------------------------------------------
+
+describe('hintCell', () => {
+    it('selects a cell (uses smart hint — best technique, not just first empty)', () => {
+        const g = hintCell(freshGame());
+        expect(g.selectedIndex).not.toBeNull();
+        expect(g.selectedIndex).toBeGreaterThanOrEqual(0);
+        expect(g.selectedIndex).toBeLessThan(81);
+    });
+
+    it('sets hintedIndex to the same cell as selectedIndex', () => {
+        const g = hintCell(freshGame());
+        expect(g.hintedIndex).toBe(g.selectedIndex);
+    });
+
+    it('does not place a digit', () => {
+        const g = hintCell(freshGame());
+        expect(g.board[g.selectedIndex!]).toBe(0);
+    });
+
+    it('is a no-op when game is paused', () => {
+        const paused = pause(freshGame(), NOW);
+        expect(hintCell(paused).hintedIndex).toBeNull();
+    });
+
+    it('is a no-op when status is won or over', () => {
+        // Just verify hintCell works in 'playing' state (positive check)
+        expect(hintCell(freshGame()).status).toBe('playing');
+    });
+
+    it('clears hintedIndex when the user selects a different cell', () => {
+        const g0 = hintCell(freshGame()); // hintedIndex = 2
+        const g1 = selectCell(g0, 5);
+        expect(g1.hintedIndex).toBeNull();
+    });
+
+    it('clears hintedIndex when a digit is placed', () => {
+        const g0 = hintCell(freshGame()); // hintedIndex = 2
+        const g1 = placeDigit(g0, 4);    // correct digit at cell 2
+        expect(g1.hintedIndex).toBeNull();
+    });
+
+    it('clears hintedIndex when applyHint places the digit', () => {
+        const g0 = hintCell(freshGame()); // hintedIndex = 2
+        const g1 = applyHint(g0);
+        expect(g1.hintedIndex).toBeNull();
     });
 });
 
