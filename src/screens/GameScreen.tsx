@@ -111,6 +111,7 @@ export function GameScreen({
                     justifyContent: 'space-between',
                     width: '100%',
                     maxWidth: GRID_WIDTH,
+                    padding: '4px 4px',
                 }}
             >
                 <MistakeCounter count={game.mistakeCount} limit={game.mistakeLimit} />

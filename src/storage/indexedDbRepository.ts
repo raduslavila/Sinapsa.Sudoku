@@ -87,7 +87,11 @@ function gameStateToRecord(state: GameState): PersistedGame {
         status: state.status === 'paused' ? 'paused' : 'playing',
         mistakeCount: state.mistakeCount,
         mistakeLimit: state.mistakeLimit,
-        elapsedMs: state.elapsedMs,
+        // Freeze the running segment so elapsed time survives save/load cycles.
+        elapsedMs:
+            state.status === 'playing' && state.startedAt !== null
+                ? state.elapsedMs + (Date.now() - state.startedAt)
+                : state.elapsedMs,
 
         undoStack: state.undoStack.slice(-MAX_UNDO_STACK).map(serializeSnapshot),
         redoStack: state.redoStack.slice(-MAX_UNDO_STACK).map(serializeSnapshot),

@@ -54,7 +54,7 @@ export function NumberPad({
                 padding: '0 8px',
                 width: '100%',
                 maxWidth: 'calc(var(--cell-size) * 9)',
-                margin: '0 auto',
+                margin: '4px auto',
             }}
         >
             {/* Digit row */}

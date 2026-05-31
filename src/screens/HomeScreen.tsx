@@ -39,7 +39,7 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                 gap: 24,
             }}
         >
-            <Logo size={240} />
+            <Logo size={300} />
 
             {/* Continue Game card */}
             {savedGame && (
