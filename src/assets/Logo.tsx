@@ -35,7 +35,7 @@ export function Logo({ size = 240, className }: LogoProps) {
     return (
         <div
             role="img"
-            aria-label="Sudoku Synapse"
+            aria-label="Sudoku"
             className={className}
             style={{ display: 'inline-flex', lineHeight: 0, flexShrink: 0 }}
             dangerouslySetInnerHTML={{ __html: svg }}

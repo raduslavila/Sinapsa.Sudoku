@@ -1,4 +1,4 @@
-# Sinapsa Sudoku
+# Sudoku
 
 A production-quality, offline-first Sudoku app built with React, TypeScript, and Vite. Packaged for Android via Capacitor. Designed for future Google Play Games cloud saves.
 

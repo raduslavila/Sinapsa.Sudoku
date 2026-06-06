@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy · Sudoku</title>
+  <style>
+    :root {
+      --bg: #f8f7f4;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --muted: #6b6b6b;
+      --rule: #e4e2dc;
+      --accent: #2d6a4f;
+      --accent-bg: #edf6f1;
+      --radius: 10px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111211;
+        --surface: #1c1e1c;
+        --text: #e8e8e4;
+        --muted: #888a86;
+        --rule: #2c2e2c;
+        --accent: #52b788;
+        --accent-bg: #1a2a22;
+      }
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Georgia', 'Times New Roman', serif;
+      line-height: 1.75;
+      padding: 2rem 1.25rem 5rem;
+    }
+
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* ── header ── */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2.75rem;
+      padding-bottom: 1.75rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--accent-bg);
+      border: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo svg {
+      display: block;
+    }
+
+    header hgroup {
+      flex: 1;
+    }
+
+    header h1 {
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    header p {
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+
+    /* ── notice banner ── */
+    .notice {
+      background: var(--accent-bg);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1rem 1.25rem;
+      margin-bottom: 2.5rem;
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .notice strong {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: var(--accent);
+    }
+
+    /* ── sections ── */
+    section {
+      margin-bottom: 2.25rem;
+    }
+
+    section+section {
+      padding-top: 2.25rem;
+      border-top: 1px solid var(--rule);
+    }
+
+    h2 {
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.85rem;
+    }
+
+    p {
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 0.85rem;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0.85rem;
+    }
+
+    ul li {
+      font-size: 1rem;
+      padding: 0.35rem 0 0.35rem 1.5rem;
+      position: relative;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    ul li:last-child {
+      border-bottom: none;
+    }
+
+    ul li::before {
+      content: '·';
+      position: absolute;
+      left: 0.4rem;
+      color: var(--accent);
+      font-size: 1.3rem;
+      line-height: 1.6;
+    }
+
+    /* ── contact ── */
+    .contact-link {
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.9rem;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 0.9rem 1.1rem;
+      display: inline-block;
+      color: var(--accent);
+      text-decoration: none;
+      margin-top: 0.5rem;
+    }
+
+    .contact-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ── footer ── */
+    footer {
+      margin-top: 3.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--rule);
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <header>
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true">
+          <rect x="2" y="2" width="7" height="7" rx="1.5" fill="var(--accent)" opacity="0.9" />
+          <rect x="10.5" y="2" width="7" height="7" rx="1.5" fill="var(--accent)" opacity="0.5" />
+          <rect x="19" y="2" width="7" height="7" rx="1.5" fill="var(--accent)" opacity="0.9" />
+          <rect x="2" y="10.5" width="7" height="7" rx="1.5" fill="var(--accent)" opacity="0.5" />
+          <rect x="10.5" y="10.5" width="7" height="7" rx="1.5" fill="var(--accent)" opacity="1" />
+          <rect x="19" y="10.5" width="7" height="7" rx="1.5" fill="var(--accent)" opacity="0.5" />
+          <rect x="2" y="19" width="7" height="7" rx="1.5" fill="var(--accent)" opacity="0.9" />
+          <rect x="10.5" y="19" width="7" height="7" rx="1.5" fill="var(--accent)" opacity="0.5" />
+          <rect x="19" y="19" width="7" height="7" rx="1.5" fill="var(--accent)" opacity="0.9" />
+        </svg>
+      </div>
+      <hgroup>
+        <h1>Sudoku</h1>
+        <p>Privacy Policy &nbsp;·&nbsp; Effective June 2026</p>
+      </hgroup>
+    </header>
+
+    <div class="notice">
+      <strong>Short version</strong>
+      Sudoku collects no personal data, connects to no servers, and shares nothing with
+      anyone. Everything stays on your device.
+    </div>
+
+    <section>
+      <h2>Overview</h2>
+      <p>
+        Sudoku is developed and maintained by Radu Slăvilă (the "Developer"). This policy
+        describes what information the app handles, how it is stored, and what your rights are.
+      </p>
+      <p>
+        The app is designed to function entirely offline. It requires no account, no login, and no
+        network connection to play or use any of its features.
+      </p>
+    </section>
+
+    <section>
+      <h2>Data we collect</h2>
+      <p>None. The app does not collect, transmit, or share any personal information.</p>
+      <p>
+        Specifically, Sudoku does not collect your name, email address, device identifier,
+        IP address, location, usage analytics, crash diagnostics, or any other information that
+        could identify you as an individual.
+      </p>
+    </section>
+
+    <section>
+      <h2>Data stored on your device</h2>
+      <p>
+        The app stores the following data locally in your device's browser storage (IndexedDB),
+        solely to provide its core functionality:
+      </p>
+      <ul>
+        <li>The current in-progress game state (board, timer, move history)</li>
+        <li>Completed game records used to calculate statistics (difficulty, time, outcome)</li>
+        <li>Your preferences (theme, per-difficulty hint and mistake limits)</li>
+      </ul>
+      <p>
+        This data never leaves your device. It is not synced to any server, not accessible by the
+        Developer, and not associated with your identity in any way. You can clear it at any time
+        by clearing the app's storage in your device settings.
+      </p>
+    </section>
+
+    <section>
+      <h2>Third parties</h2>
+      <p>
+        Sudoku does not integrate any third-party analytics, advertising SDKs, social login,
+        crash reporting services, or tracking libraries. No data is shared with any third party.
+      </p>
+      <p>
+        The app is distributed through the Google Play Store. Google may collect information about
+        your device and app usage in accordance with their own privacy policy, over which the
+        Developer has no control.
+      </p>
+    </section>
+
+    <section>
+      <h2>Permissions</h2>
+      <p>
+        The app does not request access to your contacts, camera, microphone, location, files,
+        or any other sensitive device permission. No special Android permissions beyond basic
+        app operation are required or requested.
+      </p>
+    </section>
+
+    <section>
+      <h2>Children's privacy</h2>
+      <p>
+        Sudoku does not knowingly collect any information from children or from anyone.
+        Because no data collection occurs at all, the app is safe for users of all ages.
+      </p>
+    </section>
+
+    <section>
+      <h2>Open source</h2>
+      <p>
+        Sudoku is free and open-source software, licensed under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener noreferrer">GNU General Public
+          License v3.0</a>.
+        The complete source code is publicly available for inspection on
+        <a href="https://github.com/raduslavila/Sinapsa.Sudoku" target="_blank" rel="noopener noreferrer">GitHub</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Changes to this policy</h2>
+      <p>
+        If this policy is updated in a meaningful way (for example, if a future version of the app
+        introduces optional cloud saves or analytics), the effective date above will be updated and
+        the change will be noted in the app's release notes.
+      </p>
+    </section>
+
+    <section>
+      <h2>Contact</h2>
+      <p>Questions about this policy or the app can be directed to the Developer:</p>
+      <a class="contact-link" href="https://github.com/raduslavila/Sinapsa.Sudoku/issues" target="_blank"
+        rel="noopener noreferrer">
+        Open an issue on GitHub →
+      </a>
+    </section>
+
+    <footer>
+      <span>© 2026 Radu Slăvilă &nbsp;·&nbsp; Sudoku</span>
+      <a href="https://github.com/raduslavila/Sinapsa.Sudoku" target="_blank" rel="noopener noreferrer">
+        Source on GitHub
+      </a>
+    </footer>
+
+  </div>
+</body>
+
+</html>

@@ -1,5 +1,5 @@
 {
-    "name": "Sudoku Synapse",
+    "name": "Sudoku",
     "short_name": "Sudoku",
     "description": "10 difficulty levels. Offline-first. Think fast.",
     "start_url": "/",

@@ -24,7 +24,6 @@ interface Props {
 }
 
 const GRID_WIDTH = 'calc(var(--cell-size) * 9 + 2px)';
-const SHOW_AD_PLACEHOLDER = false;
 
 function formatDuration(ms: number): string {
     const totalSeconds = Math.floor(ms / 1000);
@@ -373,28 +372,6 @@ export function GameScreen({
                     remainingDigitCounts={remainingDigitCounts}
                 />
 
-                {SHOW_AD_PLACEHOLDER && (
-                    <div
-                        aria-hidden="true"
-                        style={{
-                            width: '100%',
-                            maxWidth: GRID_WIDTH,
-                            margin: '0 auto',
-                            height: 60,
-                            flexShrink: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            border: '1.5px dashed var(--color-border)',
-                            borderRadius: 6,
-                            color: '#aaa',
-                            fontSize: 12,
-                            letterSpacing: 1,
-                        }}
-                    >
-                        AD
-                    </div>
-                )}
             </div>
         </main>
     );

@@ -95,7 +95,7 @@
 - ✅ Splash screen not needed — `Theme.SplashScreen` shows `ic_launcher` on `colorBackground` automatically.
 - ✅ App name and short description localisation (`strings.xml`).
 - ✅ Android status bar transparent, navigation bar matches `colorBackground`.
-- ✅ Web app favicon and `<title>` (Sudoku Synapse).
+- ✅ Web app favicon and `<title>` (Sudoku).
 - ✅ `manifest.webmanifest` for PWA (name, icons, theme_color, background_color).
 - ✅ Meta tags (`og:title`, `og:description`, `og:type`) for link previews.
 - ✅ 7-palette color system (electric-blue, midnight-purple, forest-green, sunset-orange, rose-gold, obsidian, arctic) with light/dark variants.
