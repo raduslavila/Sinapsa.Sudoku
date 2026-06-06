@@ -101,6 +101,41 @@
 - ✅ 7-palette color system (electric-blue, midnight-purple, forest-green, sunset-orange, rose-gold, obsidian, arctic) with light/dark variants.
 - ✅ Orientation locked to portrait (`android:screenOrientation="portrait"`).
 
+## Milestone 7.2 — In-app rating prompt
+
+**Goal:** surface the native store review dialog after meaningful engagement to maximise review volume without disrupting gameplay.
+
+### Trigger rule
+
+- Fire after the player **wins their 3rd game** (cumulative across sessions).
+- Only fire once per install (persist a `ratingPromptShown` flag in IndexedDB / `settingsStore`).
+- Never fire mid-game; fire only on the win-summary screen after the dialog is dismissed.
+
+### Plugin
+
+Use **`@capacitor-community/in-app-review`** (wraps `SKStoreReviewController` on iOS and the Android In-App Review API).
+
+Fallback for the browser/web build: no-op — the adapter must guard with `Capacitor.isNativePlatform()` so the web app is unaffected.
+
+### Implementation checklist
+
+- [x] Install `@capacitor-community/in-app-review` and run `cap sync android`.
+- [x] Add `RatingService` in `src/state/ratingService.ts`:
+  - `shouldPrompt(completedGameCount: number): boolean` — pure, reads flag from store.
+  - `markPrompted(): Promise<void>` — persists the flag.
+  - `requestReview(): Promise<void>` — calls the plugin only on native; no-op on web.
+- [x] Persist `ratingPromptShown: boolean` in `settingsStore` (IndexedDB, bump schema version if needed).
+- [x] Call `RatingService.requestReview()` from `GameScreen` when the win banner is acknowledged and `shouldPrompt` returns `true`.
+- [x] Add unit tests for `shouldPrompt` (thresholds, already-shown guard).
+- [x] Register the plugin in `android/app/src/main/assets/capacitor.plugins.json`.
+- [x] Main activity plugin registration is automatic via Capacitor plugin metadata; no manual `MainActivity` code changes required.
+
+### Notes
+
+- The Android In-App Review API gives Google full control over whether the dialog actually appears; the call is a request, not a guarantee.
+- Do not show a custom "Enjoying the app?" pre-prompt — Google Play policy prohibits steering users toward positive reviews.
+- Day 7 retention is a primary ranking signal; triggering after the 3rd win targets players who have already demonstrated engagement and are most likely to leave a positive review.
+
 ## Milestone 8 — Play Games bridge stub
 
 - Define TypeScript adapter.

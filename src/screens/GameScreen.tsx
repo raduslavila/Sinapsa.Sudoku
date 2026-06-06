@@ -7,6 +7,7 @@ import { NumberPad } from '../components/NumberPad.tsx';
 import { Timer } from '../components/Timer.tsx';
 import { MistakeCounter } from '../components/MistakeCounter.tsx';
 import { getRemainingDigitCounts } from '../components/numberPadCounts.ts';
+import { maybePromptForRating } from '../state/ratingService.ts';
 
 interface Props {
     game: GameState;
@@ -73,6 +74,20 @@ export function GameScreen({
 
     const hintedIndices: ReadonlySet<number> =
         game.hintedIndex !== null ? new Set([game.hintedIndex]) : new Set();
+
+    const acknowledgeCompletion = (nextAction?: () => void): void => {
+        setDismissedCompletionSeed(puzzle.seed);
+        if (game.status === 'won') {
+            void maybePromptForRating({
+                seed: puzzle.seed,
+                difficultyId: puzzle.difficultyId,
+                elapsedMs: game.elapsedMs,
+                mistakeCount: game.mistakeCount,
+                hintsUsed: game.hintsUsed,
+            });
+        }
+        nextAction?.();
+    };
 
     return (
         <main
@@ -250,7 +265,7 @@ export function GameScreen({
                                 <button
                                     type="button"
                                     aria-label="Dismiss completion popup"
-                                    onClick={() => setDismissedCompletionSeed(puzzle.seed)}
+                                    onClick={() => acknowledgeCompletion()}
                                     style={{
                                         position: 'absolute',
                                         top: 12,
@@ -308,7 +323,7 @@ export function GameScreen({
                                 >
                                     <button
                                         type="button"
-                                        onClick={onHome}
+                                        onClick={() => acknowledgeCompletion(onHome)}
                                         style={{
                                             flex: 1,
                                             padding: '10px 12px',
@@ -325,10 +340,7 @@ export function GameScreen({
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => {
-                                            setDismissedCompletionSeed(puzzle.seed);
-                                            onNewGame();
-                                        }}
+                                        onClick={() => acknowledgeCompletion(onNewGame)}
                                         style={{
                                             flex: 1,
                                             padding: '10px 12px',

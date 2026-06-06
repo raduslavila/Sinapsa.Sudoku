@@ -44,6 +44,8 @@ export interface SettingsState {
     readonly hintLimitOverrides: Partial<Record<DifficultyId, number | null>>;
     /** Developer-only: highlight note digits that conflict with placed values. */
     readonly showWrongNoteConflicts: boolean;
+    /** One-time gate for native in-app review prompt. */
+    readonly ratingPromptShown: boolean;
 }
 
 interface SettingsStore extends SettingsState {
@@ -56,6 +58,7 @@ interface SettingsStore extends SettingsState {
     /** Set hint limit for a difficulty. Pass undefined to reset to unlimited. */
     setHintLimit: (difficultyId: DifficultyId, limit: number | null | undefined) => void;
     setShowWrongNoteConflicts: (enabled: boolean) => void;
+    setRatingPromptShown: (shown: boolean) => void;
 }
 
 export const DEV_SETTINGS_ENABLED = import.meta.env.DEV;
@@ -70,6 +73,7 @@ const DEFAULT_STATE: SettingsState = {
     mistakeLimitOverrides: {},
     hintLimitOverrides: {},
     showWrongNoteConflicts: false,
+    ratingPromptShown: false,
 };
 
 // ---------------------------------------------------------------------------
@@ -107,6 +111,7 @@ function persist(state: SettingsState): void {
             Object.entries(state.hintLimitOverrides).map(([k, v]) => [k, v ?? null])
         ) as Record<string, number | null>,
         showWrongNoteConflicts: state.showWrongNoteConflicts,
+        ratingPromptShown: state.ratingPromptShown,
     };
     void saveSettings(record);
 }
@@ -137,9 +142,17 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         const theme = saved.theme;
         const palette = (saved.palette as PaletteId | undefined) ?? 'electric-blue';
         const showWrongNoteConflicts = saved.showWrongNoteConflicts ?? false;
+        const ratingPromptShown = saved.ratingPromptShown ?? false;
         applyThemeToDOM(theme);
         applyPaletteToDOM(palette);
-        set({ theme, palette, mistakeLimitOverrides, hintLimitOverrides, showWrongNoteConflicts });
+        set({
+            theme,
+            palette,
+            mistakeLimitOverrides,
+            hintLimitOverrides,
+            showWrongNoteConflicts,
+            ratingPromptShown,
+        });
     },
 
     setTheme: (theme) => {
@@ -179,6 +192,11 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     setShowWrongNoteConflicts: (enabled) => {
         set({ showWrongNoteConflicts: enabled });
         persist({ ...get(), showWrongNoteConflicts: enabled });
+    },
+
+    setRatingPromptShown: (shown) => {
+        set({ ratingPromptShown: shown });
+        persist({ ...get(), ratingPromptShown: shown });
     },
 }));
 

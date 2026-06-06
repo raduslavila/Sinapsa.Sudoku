@@ -210,4 +210,8 @@ describe('settingsSchema', () => {
     it('accepts the optional wrong-note toggle', () => {
         expect(settingsSchema.safeParse({ ...validSettings, showWrongNoteConflicts: true }).success).toBe(true);
     });
+
+    it('accepts the optional rating prompt flag', () => {
+        expect(settingsSchema.safeParse({ ...validSettings, ratingPromptShown: true }).success).toBe(true);
+    });
 });
