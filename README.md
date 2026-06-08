@@ -215,7 +215,7 @@ Google Play Games integration (sign-in, cloud save snapshots, achievements, lead
 - [x] M4.1 — UX refinements and smart hint algorithm
 - [x] M5 — IndexedDB persistence (auto-save, continue game)
 - [x] M6 — Statistics, settings, dark mode, configurable limits
-- [ ] M7 — Android packaging and Play Store preparation
+- [X] M7 — Android packaging and Play Store preparation
 - [ ] M8 — Google Play Games bridge stub (Kotlin Capacitor plugin)
 - [ ] M9 — Google Play Games implementation (sign-in, snapshots, achievements)
 - [ ] M10 — Accessibility, E2E tests, PWA manifest, polish
