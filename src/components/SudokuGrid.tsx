@@ -12,6 +12,7 @@ interface Props {
     notes: ReadonlyMap<number, ReadonlySet<Digit>>;
     selectedIndex: number | null;
     hintedIndices: ReadonlySet<number>;
+    sameNumberIndices: ReadonlySet<number>;
     onSelectCell: (index: number) => void;
     onDigitInput: (digit: Digit) => void;
     onClear: () => void;
@@ -70,6 +71,7 @@ export function SudokuGrid({
     notes,
     selectedIndex,
     hintedIndices,
+    sameNumberIndices,
     onSelectCell,
     onDigitInput,
     onClear,
@@ -143,20 +145,17 @@ export function SudokuGrid({
                         isGiven={givens.has(i)}
                         isSelected={selectedIndex === i}
                         isPeer={selectedIndex !== null && selectedIndex !== i && peers.has(i)}
+                        isSameNumber={selectedIndex !== null && selectedIndex !== i && sameNumberIndices.has(i)}
                         isConflict={conflicts.has(i)}
                         isWrong={!givens.has(i) && value !== 0 && value !== solution[i]}
                         isHinted={hintedIndices.has(i)}
-                        completionAnimation={
-                            completionDelayMs === undefined || completionWave === null
-                                ? null
-                                : { token: completionWave.token, delayMs: completionDelayMs }
-                        }
+                        completionAnimation={completionDelayMs === undefined || completionWave === null
+                            ? null
+                            : { token: completionWave.token, delayMs: completionDelayMs }}
                         notes={cellNotes}
-                        conflictingNotes={
-                            showWrongNoteConflicts
-                                ? getConflictingNotes(board, cellNotes, i)
-                                : new Set<Digit>()
-                        }
+                        conflictingNotes={showWrongNoteConflicts
+                            ? getConflictingNotes(board, cellNotes, i)
+                            : new Set<Digit>()}
                         onClick={onSelectCell}
                     />
                 );

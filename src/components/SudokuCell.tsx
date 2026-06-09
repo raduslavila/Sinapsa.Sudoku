@@ -12,6 +12,7 @@ interface Props {
     isGiven: boolean;
     isSelected: boolean;
     isPeer: boolean;
+    isSameNumber: boolean;
     isConflict: boolean;
     isWrong: boolean;
     isHinted: boolean;
@@ -32,6 +33,7 @@ export function SudokuCell({
     isConflict,
     isWrong,
     isHinted,
+    isSameNumber,
     completionAnimation,
     notes,
     conflictingNotes,
@@ -51,6 +53,11 @@ export function SudokuCell({
         else if (isHinted) textColor = 'var(--color-hint)';
         else textColor = 'var(--color-user)';
     }
+
+    let outline = undefined;
+    if (isSelected) outline = '2px solid var(--color-primary)';
+    else if (isSameNumber) outline = '2px dashed var(--color-primary)';
+    else if (isHinted && value === 0) outline = '2px solid var(--color-hint)';
 
     const borderRight = col === 2 || col === 5 ? '2px solid #888' : '1px solid var(--color-border)';
     const borderBottom = row === 2 || row === 5 ? '2px solid #888' : '1px solid var(--color-border)';
@@ -78,11 +85,7 @@ export function SudokuCell({
         color: textColor,
         position: 'relative',
         padding: 0,
-        outline: isSelected
-            ? '2px solid var(--color-primary)'
-            : isHinted && value === 0
-                ? '2px solid var(--color-hint)'
-                : undefined,
+        outline: outline,
         outlineOffset: '-2px',
         boxShadow: isHinted && value === 0 ? 'inset 0 0 0 2px var(--color-hint)' : undefined,
         userSelect: 'none',
