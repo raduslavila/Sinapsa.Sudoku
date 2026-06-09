@@ -120,11 +120,13 @@ function ThemeButton({
 function LimitInput({
     value,
     defaultValue,
+    minimumValue,
     onChange,
     placeholder,
 }: {
     value: number | null | undefined;
     defaultValue: number | null;
+    minimumValue: number;
     onChange: (v: number | null | undefined) => void;
     placeholder: string;
 }) {
@@ -138,7 +140,7 @@ function LimitInput({
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <input
                 type="number"
-                min={1}
+                min={minimumValue}
                 max={99}
                 value={displayValue}
                 placeholder={placeholder}
@@ -148,7 +150,7 @@ function LimitInput({
                         onChange(null); // unlimited override
                     } else {
                         const n = parseInt(raw, 10);
-                        if (!isNaN(n) && n >= 1) onChange(n);
+                        if (!isNaN(n) && n >= minimumValue) onChange(n);
                     }
                 }}
                 style={{
@@ -311,12 +313,14 @@ export function SettingsScreen({ onBack }: Props) {
                             <LimitInput
                                 value={mistakeVal}
                                 defaultValue={d.defaultMistakeLimit}
+                                minimumValue={1}
                                 onChange={(v) => setMistakeLimit(d.id as DifficultyId, v)}
                                 placeholder={d.defaultMistakeLimit === null ? '∞' : String(d.defaultMistakeLimit)}
                             />
                             <LimitInput
                                 value={hintVal}
                                 defaultValue={d.defaultHintLimit}
+                                minimumValue={0}
                                 onChange={(v) => setHintLimit(d.id as DifficultyId, v)}
                                 placeholder={d.defaultHintLimit === null ? '∞' : String(d.defaultHintLimit)}
                             />
