@@ -3,7 +3,7 @@ import type { CellValue, Digit } from '../engine/types.ts';
 import { getPeerIndices } from '../engine/grid.ts';
 import { SudokuCell } from './SudokuCell.tsx';
 import { getCompletionWaveDelays } from './unitCompletion.ts';
-import { DEV_SETTINGS_ENABLED, useSettingsStore } from '../state/settingsStore.ts';
+import { useSettingsStore } from '../state/settingsStore.ts';
 
 interface Props {
     board: readonly CellValue[];
@@ -12,6 +12,7 @@ interface Props {
     notes: ReadonlyMap<number, ReadonlySet<Digit>>;
     selectedIndex: number | null;
     hintedIndices: ReadonlySet<number>;
+    sameNumberIndices: ReadonlySet<number>;
     onSelectCell: (index: number) => void;
     onDigitInput: (digit: Digit) => void;
     onClear: () => void;
@@ -70,6 +71,7 @@ export function SudokuGrid({
     notes,
     selectedIndex,
     hintedIndices,
+    sameNumberIndices,
     onSelectCell,
     onDigitInput,
     onClear,
@@ -77,7 +79,7 @@ export function SudokuGrid({
     const peers = selectedIndex !== null ? new Set(getPeerIndices(selectedIndex)) : new Set<number>();
     const conflicts = buildConflicts(board);
     const showWrongNoteConflicts = useSettingsStore(
-        (state) => DEV_SETTINGS_ENABLED && state.showWrongNoteConflicts,
+        (state) => state.showWrongNoteConflicts,
     );
     const previousBoardRef = useRef(board);
     const completionWaveTokenRef = useRef(0);
@@ -143,20 +145,17 @@ export function SudokuGrid({
                         isGiven={givens.has(i)}
                         isSelected={selectedIndex === i}
                         isPeer={selectedIndex !== null && selectedIndex !== i && peers.has(i)}
+                        isSameNumber={selectedIndex !== null && selectedIndex !== i && sameNumberIndices.has(i)}
                         isConflict={conflicts.has(i)}
                         isWrong={!givens.has(i) && value !== 0 && value !== solution[i]}
                         isHinted={hintedIndices.has(i)}
-                        completionAnimation={
-                            completionDelayMs === undefined || completionWave === null
-                                ? null
-                                : { token: completionWave.token, delayMs: completionDelayMs }
-                        }
+                        completionAnimation={completionDelayMs === undefined || completionWave === null
+                            ? null
+                            : { token: completionWave.token, delayMs: completionDelayMs }}
                         notes={cellNotes}
-                        conflictingNotes={
-                            showWrongNoteConflicts
-                                ? getConflictingNotes(board, cellNotes, i)
-                                : new Set<Digit>()
-                        }
+                        conflictingNotes={showWrongNoteConflicts
+                            ? getConflictingNotes(board, cellNotes, i)
+                            : new Set<Digit>()}
                         onClick={onSelectCell}
                     />
                 );

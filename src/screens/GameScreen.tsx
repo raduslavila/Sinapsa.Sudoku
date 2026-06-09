@@ -75,6 +75,16 @@ export function GameScreen({
     const hintedIndices: ReadonlySet<number> =
         game.hintedIndex !== null ? new Set([game.hintedIndex]) : new Set();
 
+    const sameNumberIndices: ReadonlySet<number> =
+        game.selectedIndex !== null && game.board[game.selectedIndex] !== 0
+            ? new Set(game.board.reduce<number[]>((acc, val, idx) => {
+                if (val === game.board[game.selectedIndex!] && idx !== game.selectedIndex) {
+                    acc.push(idx);
+                }
+                return acc;
+            }, []))
+            : new Set();
+
     const acknowledgeCompletion = (nextAction?: () => void): void => {
         setDismissedCompletionSeed(puzzle.seed);
         if (game.status === 'won') {
@@ -226,6 +236,7 @@ export function GameScreen({
                             notes={game.notes}
                             selectedIndex={game.selectedIndex}
                             hintedIndices={hintedIndices}
+                            sameNumberIndices={sameNumberIndices}
                             onSelectCell={onSelectCell}
                             onDigitInput={onDigitInput}
                             onClear={onClear}

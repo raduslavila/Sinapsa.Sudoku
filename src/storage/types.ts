@@ -56,6 +56,8 @@ export interface PersistedSettings {
     readonly hintLimitOverrides: Readonly<Record<string, number | null>>;
     /** Developer-only: highlight note digits that conflict with placed values. */
     readonly showWrongNoteConflicts?: boolean;
+    /** Disable number pad badge and functionality. */
+    readonly disableNumberPadBadge?: boolean;
     /** One-time gate for native in-app review prompt. */
     readonly ratingPromptShown?: boolean;
 }
