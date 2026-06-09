@@ -3,7 +3,7 @@ import type { CellValue, Digit } from '../engine/types.ts';
 import { getPeerIndices } from '../engine/grid.ts';
 import { SudokuCell } from './SudokuCell.tsx';
 import { getCompletionWaveDelays } from './unitCompletion.ts';
-import { DEV_SETTINGS_ENABLED, useSettingsStore } from '../state/settingsStore.ts';
+import { useSettingsStore } from '../state/settingsStore.ts';
 
 interface Props {
     board: readonly CellValue[];
@@ -79,7 +79,7 @@ export function SudokuGrid({
     const peers = selectedIndex !== null ? new Set(getPeerIndices(selectedIndex)) : new Set<number>();
     const conflicts = buildConflicts(board);
     const showWrongNoteConflicts = useSettingsStore(
-        (state) => DEV_SETTINGS_ENABLED && state.showWrongNoteConflicts,
+        (state) => state.showWrongNoteConflicts,
     );
     const previousBoardRef = useRef(board);
     const completionWaveTokenRef = useRef(0);

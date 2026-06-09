@@ -68,5 +68,6 @@ export const settingsSchema = z.object({
     mistakeLimitOverrides: z.record(z.string(), z.number().int().positive().nullable()),
     hintLimitOverrides: z.record(z.string(), z.number().int().positive().nullable()),
     showWrongNoteConflicts: z.boolean().optional(),
+    disableNumberPadBadge: z.boolean().optional(),
     ratingPromptShown: z.boolean().optional(),
 });

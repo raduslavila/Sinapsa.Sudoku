@@ -46,6 +46,8 @@ export interface SettingsState {
     readonly showWrongNoteConflicts: boolean;
     /** One-time gate for native in-app review prompt. */
     readonly ratingPromptShown: boolean;
+    /** Disable number pad badge and functionality. */
+    readonly disableNumberPadBadge: boolean;
 }
 
 interface SettingsStore extends SettingsState {
@@ -58,6 +60,7 @@ interface SettingsStore extends SettingsState {
     /** Set hint limit for a difficulty. Pass undefined to reset to unlimited. */
     setHintLimit: (difficultyId: DifficultyId, limit: number | null | undefined) => void;
     setShowWrongNoteConflicts: (enabled: boolean) => void;
+    setDisableNumberPadBadge: (enabled: boolean) => void;
     setRatingPromptShown: (shown: boolean) => void;
 }
 
@@ -73,6 +76,7 @@ const DEFAULT_STATE: SettingsState = {
     mistakeLimitOverrides: {},
     hintLimitOverrides: {},
     showWrongNoteConflicts: false,
+    disableNumberPadBadge: false,
     ratingPromptShown: false,
 };
 
@@ -111,6 +115,7 @@ function persist(state: SettingsState): void {
             Object.entries(state.hintLimitOverrides).map(([k, v]) => [k, v ?? null])
         ) as Record<string, number | null>,
         showWrongNoteConflicts: state.showWrongNoteConflicts,
+        disableNumberPadBadge: state.disableNumberPadBadge,
         ratingPromptShown: state.ratingPromptShown,
     };
     void saveSettings(record);
@@ -142,6 +147,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         const theme = saved.theme;
         const palette = (saved.palette as PaletteId | undefined) ?? 'electric-blue';
         const showWrongNoteConflicts = saved.showWrongNoteConflicts ?? false;
+        const disableNumberPadBadge = saved.disableNumberPadBadge ?? false;
         const ratingPromptShown = saved.ratingPromptShown ?? false;
         applyThemeToDOM(theme);
         applyPaletteToDOM(palette);
@@ -151,6 +157,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
             mistakeLimitOverrides,
             hintLimitOverrides,
             showWrongNoteConflicts,
+            disableNumberPadBadge,
             ratingPromptShown,
         });
     },
@@ -197,6 +204,11 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     setRatingPromptShown: (shown) => {
         set({ ratingPromptShown: shown });
         persist({ ...get(), ratingPromptShown: shown });
+    },
+
+    setDisableNumberPadBadge: (enabled) => {
+        set({ disableNumberPadBadge: enabled });
+        persist({ ...get(), disableNumberPadBadge: enabled });
     },
 }));
 

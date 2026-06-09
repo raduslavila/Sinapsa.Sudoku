@@ -1,5 +1,6 @@
 import type { Digit } from '../engine/types.ts';
 import type { RemainingDigitCounts } from './numberPadCounts.ts';
+import { useSettingsStore } from '../state/settingsStore.ts';
 
 interface Props {
     onDigit: (d: Digit) => void;
@@ -106,6 +107,10 @@ export function NumberPad({
     const hintDisabled = disabled || hintsUnavailable;
     const hintLabelSuffix = remainingHints === null ? '' : ` (${remainingHints} left)`;
 
+    const isNumberBadgeDisabled = useSettingsStore(
+        (state) => state.disableNumberPadBadge,
+    );
+
     return (
         <div
             aria-label="Number pad"
@@ -121,7 +126,7 @@ export function NumberPad({
         >
             {/* Digit row */}
             {DIGITS.map((d) => {
-                const digitDisabled = disabled || remainingDigitCounts[d] === 0;
+                const digitDisabled = disabled || (remainingDigitCounts[d] === 0 && !isNumberBadgeDisabled);
                 return (
                     <button
                         key={d}
@@ -132,9 +137,11 @@ export function NumberPad({
                         style={withDisabledStyle(btnBase, digitDisabled)}
                     >
                         <span>{d}</span>
-                        <span aria-hidden="true" style={withDisabledBadgeStyle(digitBadge, digitDisabled)}>
-                            {remainingDigitCounts[d]}
-                        </span>
+                        {isNumberBadgeDisabled ? null : (
+                            <span aria-hidden="true" style={withDisabledBadgeStyle(digitBadge, digitDisabled)}>
+                                {remainingDigitCounts[d]}
+                            </span>
+                        )}
                     </button>
                 );
             })}
