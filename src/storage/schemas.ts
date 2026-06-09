@@ -41,7 +41,7 @@ export const persistedGameSchema = z.object({
     redoStack: z.array(snapshotSchema).readonly(),
 
     hintsUsed: z.number().int().min(0).optional(),
-    hintLimit: z.number().int().positive().nullable().optional(),
+    hintLimit: z.number().int().min(0).nullable().optional(),
 });
 
 export const persistedCompletedGameSchema = z.object({

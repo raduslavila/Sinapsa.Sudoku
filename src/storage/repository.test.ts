@@ -138,6 +138,11 @@ describe('persistedGameSchema', () => {
         expect(result.success).toBe(true);
     });
 
+    it('accepts hintLimit be zero (bug with previous validation for nightmare)', () => {
+        const result = persistedGameSchema.safeParse({ ...makeValidPersistedGame(), hintLimit: 0 });
+        expect(result.success).toBe(true);
+    });
+
     it('accepts with undo/redo history', () => {
         const snap = { board: BOARD_STR, notes: [] };
         const result = persistedGameSchema.safeParse({
