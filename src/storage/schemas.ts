@@ -42,6 +42,7 @@ export const persistedGameSchema = z.object({
 
     hintsUsed: z.number().int().min(0).optional(),
     hintLimit: z.number().int().min(0).nullable().optional(),
+    gameMode: z.enum(['classic', 'pen-and-paper']).optional(),
 });
 
 export const persistedCompletedGameSchema = z.object({
@@ -55,6 +56,7 @@ export const persistedCompletedGameSchema = z.object({
     hintsUsed: z.number().int().min(0).optional(),
     mistakeCount: z.number().int().min(0),
     elapsedMs: z.number().int().min(0),
+    gameMode: z.enum(['classic', 'pen-and-paper']).optional(),
 });
 
 // Re-export CellValue schema for external use if needed

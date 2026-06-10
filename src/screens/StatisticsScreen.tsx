@@ -139,7 +139,7 @@ export function StatisticsScreen({ onBack }: Props) {
                     {/* Per-difficulty breakdown */}
                     <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
                         <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>
-                            By difficulty
+                            Classic
                         </h3>
 
                         {/* Column headers */}
@@ -208,81 +208,154 @@ export function StatisticsScreen({ onBack }: Props) {
                                 </div>
                             );
                         })}
+                    </section>
 
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'flex-start',
-                                paddingTop: 4,
-                            }}
-                        >
-                            {!confirmClear ? (
+                    {/* Pen & Paper breakdown */}
+                    {Object.keys(stats.byPenAndPaper).length > 0 && (
+                        <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>
+                                Pen &amp; Paper
+                            </h3>
+
+                            {/* Column headers */}
+                            <div
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: '1.7fr 0.7fr 0.7fr 1fr 1.1fr 1fr',
+                                    columnGap: 8,
+                                    padding: '0 8px',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                {['Difficulty', 'Played', 'Won', 'Submits', 'Best', 'Avg'].map((h, index) => (
+                                    <span
+                                        key={h}
+                                        style={{
+                                            fontSize: 11,
+                                            color: '#888',
+                                            textAlign: index === 0 ? 'left' : 'center',
+                                            whiteSpace: 'nowrap',
+                                        }}
+                                    >
+                                        {h}
+                                    </span>
+                                ))}
+                            </div>
+
+                            {DIFFICULTIES.map((d) => {
+                                const row = stats.byPenAndPaper[d.id as DifficultyId];
+                                if (!row) return null;
+                                return (
+                                    <div
+                                        key={d.id}
+                                        style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: '1.7fr 0.7fr 0.7fr 1fr 1.1fr 1fr',
+                                            columnGap: 8,
+                                            alignItems: 'center',
+                                            padding: '10px 8px',
+                                            background: 'var(--color-surface)',
+                                            border: '1px solid var(--color-border)',
+                                            borderRadius: 8,
+                                        }}
+                                    >
+                                        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-given)' }}>
+                                            {d.name}
+                                        </span>
+                                        <span style={{ fontSize: 13, textAlign: 'center', color: 'var(--color-given)', whiteSpace: 'nowrap' }}>
+                                            {formatStatValue(row.played)}
+                                        </span>
+                                        <span style={{ fontSize: 13, textAlign: 'center', color: 'var(--color-hint)', whiteSpace: 'nowrap' }}>
+                                            {formatStatValue(row.won)}
+                                        </span>
+                                        <span style={{ fontSize: 12, textAlign: 'center', color: 'var(--color-wrong)', whiteSpace: 'nowrap' }}>
+                                            {formatStatValue(row.totalSubmitMistakes)}
+                                        </span>
+                                        <span style={{ fontSize: 12, textAlign: 'center', color: 'var(--color-given)', whiteSpace: 'nowrap' }}>
+                                            {formatTime(row.bestTimeMs)}
+                                        </span>
+                                        <span style={{ fontSize: 12, textAlign: 'center', color: '#888', whiteSpace: 'nowrap' }}>
+                                            {formatTime(row.avgTimeMs)}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </section>
+                    )}
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'flex-start',
+                            paddingTop: 4,
+                        }}
+                    >
+                        {!confirmClear ? (
+                            <button
+                                type="button"
+                                onClick={() => setConfirmClear(true)}
+                                style={{
+                                    padding: '8px 12px',
+                                    borderRadius: 8,
+                                    background: 'var(--color-surface)',
+                                    border: '1px solid var(--color-border)',
+                                    color: 'var(--color-wrong)',
+                                    fontSize: 13,
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Clear Statistics
+                            </button>
+                        ) : (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    flexWrap: 'wrap',
+                                    gap: 8,
+                                    color: 'var(--color-given)',
+                                    fontSize: 13,
+                                }}
+                            >
+                                <span style={{ color: '#888' }}>
+                                    This cannot be undone. Clear all statistics?
+                                </span>
                                 <button
                                     type="button"
-                                    onClick={() => setConfirmClear(true)}
+                                    onClick={handleClearStatistics}
+                                    disabled={isClearing}
                                     style={{
-                                        padding: '8px 12px',
+                                        padding: '6px 10px',
+                                        borderRadius: 8,
+                                        background: 'var(--color-wrong)',
+                                        color: '#fff',
+                                        fontSize: 12,
+                                        fontWeight: 600,
+                                        opacity: isClearing ? 0.6 : 1,
+                                    }}
+                                >
+                                    Yes
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setConfirmClear(false)}
+                                    disabled={isClearing}
+                                    style={{
+                                        padding: '6px 10px',
                                         borderRadius: 8,
                                         background: 'var(--color-surface)',
                                         border: '1px solid var(--color-border)',
-                                        color: 'var(--color-wrong)',
-                                        fontSize: 13,
-                                        fontWeight: 600,
-                                    }}
-                                >
-                                    Clear Statistics
-                                </button>
-                            ) : (
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        flexWrap: 'wrap',
-                                        gap: 8,
                                         color: 'var(--color-given)',
-                                        fontSize: 13,
+                                        fontSize: 12,
+                                        fontWeight: 600,
+                                        opacity: isClearing ? 0.6 : 1,
                                     }}
                                 >
-                                    <span style={{ color: '#888' }}>
-                                        This cannot be undone. Clear all statistics?
-                                    </span>
-                                    <button
-                                        type="button"
-                                        onClick={handleClearStatistics}
-                                        disabled={isClearing}
-                                        style={{
-                                            padding: '6px 10px',
-                                            borderRadius: 8,
-                                            background: 'var(--color-wrong)',
-                                            color: '#fff',
-                                            fontSize: 12,
-                                            fontWeight: 600,
-                                            opacity: isClearing ? 0.6 : 1,
-                                        }}
-                                    >
-                                        Yes
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setConfirmClear(false)}
-                                        disabled={isClearing}
-                                        style={{
-                                            padding: '6px 10px',
-                                            borderRadius: 8,
-                                            background: 'var(--color-surface)',
-                                            border: '1px solid var(--color-border)',
-                                            color: 'var(--color-given)',
-                                            fontSize: 12,
-                                            fontWeight: 600,
-                                            opacity: isClearing ? 0.6 : 1,
-                                        }}
-                                    >
-                                        No
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </section>
+                                    No
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </>
             )}
         </main>

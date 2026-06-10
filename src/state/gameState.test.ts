@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { Puzzle } from '../engine/types.ts';
+import { getPeerIndices } from '../engine/grid.ts';
 import {
     createGame,
     selectCell,
@@ -15,6 +16,7 @@ import {
     applyHint,
     getElapsedMs,
     IDLE_STATE,
+    submitSolution,
 } from './gameState.ts';
 import { EASY_PUZZLE, SOLVED_GRID } from '../test/fixtures.ts';
 
@@ -573,10 +575,136 @@ describe('IDLE_STATE', () => {
         expect(IDLE_STATE.status).toBe('idle');
     });
 
+    it('has gameMode classic', () => {
+        expect(IDLE_STATE.gameMode).toBe('classic');
+    });
+
     it('actions on IDLE_STATE return the same object (no-ops)', () => {
         expect(placeDigit(IDLE_STATE, 5)).toBe(IDLE_STATE);
         expect(clearCell(IDLE_STATE)).toBe(IDLE_STATE);
         expect(undo(IDLE_STATE)).toBe(IDLE_STATE);
         expect(redo(IDLE_STATE)).toBe(IDLE_STATE);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Pen-and-paper mode
+// ---------------------------------------------------------------------------
+
+describe('pen-and-paper mode', () => {
+    function freshPapGame() {
+        return createGame(TEST_PUZZLE, null, NOW, null, 'pen-and-paper');
+    }
+
+    // Build a game where all cells are filled with the correct solution.
+    function fullyFilledPapGame() {
+        const g = createGame(
+            { ...TEST_PUZZLE, grid: SOLVED_GRID, givens: new Set(SOLVED_GRID.map((_, i) => i)) },
+            null, NOW, null, 'pen-and-paper',
+        );
+        // Override board with a full solution so submitSolution can be called.
+        return { ...g, board: [...SOLVED_GRID] as import('../engine/types.ts').CellValue[] };
+    }
+
+    // Build a fully-filled board with one wrong digit.
+    function wrongFilledPapGame() {
+        const wrongBoard = [...SOLVED_GRID] as import('../engine/types.ts').CellValue[];
+        // flip the first cell to a different digit than in solution
+        wrongBoard[0] = (wrongBoard[0] === 9 ? 8 : wrongBoard[0] + 1) as import('../engine/types.ts').Digit;
+        const g = freshPapGame();
+        return { ...g, board: wrongBoard, status: 'playing' as const };
+    }
+
+    it('createGame stores gameMode pen-and-paper', () => {
+        expect(freshPapGame().gameMode).toBe('pen-and-paper');
+    });
+
+    it('placeDigit in P&P: wrong digit does not increment mistakeCount', () => {
+        const g = placeDigit(selectCell(freshPapGame(), 2), 1, NOW); // 1 is wrong at index 2
+        expect(g.mistakeCount).toBe(0);
+    });
+
+    it('placeDigit in P&P: wrong digit does not trigger game over', () => {
+        const g = placeDigit(selectCell(freshPapGame(), 2), 1, NOW);
+        expect(g.status).toBe('playing');
+    });
+
+    it('placeDigit in P&P: correct placement does not auto-win', () => {
+        const almostSolved = [...SOLVED_GRID] as import('../engine/types.ts').CellValue[];
+        almostSolved[0] = 0;
+        const puzzle: Puzzle = {
+            seed: 'pap-near-win',
+            grid: almostSolved,
+            solution: SOLVED_GRID,
+            difficultyId: 1,
+            givens: new Set(almostSolved.reduce<number[]>((a, v, i) => { if (v !== 0) a.push(i); return a; }, [])),
+        };
+        const g = placeDigit(
+            selectCell(createGame(puzzle, null, NOW, null, 'pen-and-paper'), 0),
+            SOLVED_GRID[0] as import('../engine/types.ts').Digit,
+            NOW,
+        );
+        expect(g.status).toBe('playing');
+    });
+
+    it('placeDigit in P&P: correct digit does not remove peer notes', () => {
+        const g0 = freshPapGame();
+        const targetDigit = SOLVED_GRID[2] as import('../engine/types.ts').Digit;
+        // Find an empty (non-given) peer of index 2 to place a note in.
+        const emptyPeers = getPeerIndices(2).filter((p) => g0.board[p] === 0);
+        expect(emptyPeers.length).toBeGreaterThan(0);
+        const peerIndex = emptyPeers[0];
+        const g1 = toggleNote(selectCell(g0, peerIndex), targetDigit);
+        const g2 = placeDigit(selectCell(g1, 2), targetDigit, NOW);
+        // Note should still be present (not auto-removed in P&P mode).
+        expect(g2.notes.get(peerIndex)?.has(targetDigit)).toBe(true);
+    });
+
+    it('submitSolution: correct board returns won result and sets status won', () => {
+        const g = fullyFilledPapGame();
+        const { state: next, result } = submitSolution(g, NOW);
+        expect(result).toBe('won');
+        expect(next.status).toBe('won');
+    });
+
+    it('submitSolution: wrong board increments mistakeCount and stays playing', () => {
+        const g = wrongFilledPapGame();
+        const { state: next, result } = submitSolution(g, NOW);
+        expect(result).toBe('incorrect');
+        expect(next.mistakeCount).toBe(1);
+        expect(next.status).toBe('playing');
+    });
+
+    it('submitSolution: board with empty cells is a no-op', () => {
+        const g = freshPapGame(); // has empty cells
+        const { state: next, result } = submitSolution(g, NOW);
+        expect(result).toBe('incorrect');
+        expect(next.mistakeCount).toBe(0);
+        expect(next.status).toBe('playing');
+    });
+
+    it('submitSolution: no-op when game mode is classic', () => {
+        const g = { ...fullyFilledPapGame(), gameMode: 'classic' as import('../engine/types.ts').GameMode };
+        const { state: next, result } = submitSolution(g, NOW);
+        expect(result).toBe('incorrect');
+        expect(next).toBe(g);
+    });
+
+    it('submitSolution: no-op when status is not playing', () => {
+        const g = { ...fullyFilledPapGame(), status: 'paused' as const };
+        const { state: next, result } = submitSolution(g, NOW);
+        expect(result).toBe('incorrect');
+        expect(next).toBe(g);
+    });
+
+    it('submitSolution freezes timer on win', () => {
+        const g = {
+            ...fullyFilledPapGame(),
+            elapsedMs: 10000,
+            startedAt: NOW,
+        };
+        const { state: next } = submitSolution(g, NOW + 5000);
+        expect(next.elapsedMs).toBe(15000);
+        expect(next.startedAt).toBeNull();
     });
 });

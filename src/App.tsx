@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { DifficultyId } from './engine/types.ts';
+import type { DifficultyId, GameMode } from './engine/types.ts';
 import type { Digit } from './engine/types.ts';
 import type { GameState } from './state/gameState.ts';
 import { useGameStore } from './state/gameStore.ts';
@@ -28,6 +28,8 @@ export default function App() {
   const setNotesMode = useGameStore((s) => s.setNotesMode);
   const pause = useGameStore((s) => s.pause);
   const resume = useGameStore((s) => s.resume);
+  const submitSolution = useGameStore((s) => s.submitSolution);
+  const giveUp = useGameStore((s) => s.giveUp);
   const initSettings = useSettingsStore((s) => s.init);
 
   const [idleScreen, setIdleScreen] = useState<IdleScreen>('home');
@@ -108,7 +110,7 @@ export default function App() {
     const fillable = 81 - puzzle.givens.size;
     const filled = board.filter((v, i) => v !== 0 && !puzzle.givens.has(i)).length;
     const percentComplete = fillable > 0 ? Math.round((filled / fillable) * 100) : 0;
-    return { difficultyName, percentComplete, elapsedMs };
+    return { difficultyName, percentComplete, elapsedMs, gameMode: pendingSave.gameMode };
   })();
 
   const handleContinue = () => {
@@ -129,6 +131,10 @@ export default function App() {
     }
   };
 
+  const handleStart = (id: DifficultyId, gameMode?: GameMode) => {
+    startGame(id, gameMode);
+  };
+
   if (game.status !== 'idle') {
     return (
       <GameScreen
@@ -144,6 +150,8 @@ export default function App() {
         onResume={resume}
         onHome={goHome}
         onNewGame={handleNewGameFromCurrent}
+        onSubmitSolution={submitSolution}
+        onGiveUp={() => { void giveUp(); }}
       />
     );
   }
@@ -158,7 +166,7 @@ export default function App() {
 
   return (
     <HomeScreen
-      onStart={(id: DifficultyId) => startGame(id)}
+      onStart={handleStart}
       savedGame={savedGameSummary}
       onContinue={handleContinue}
       onDeleteSave={handleDeleteSave}

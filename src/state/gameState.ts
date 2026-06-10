@@ -1,4 +1,4 @@
-import type { CellValue, Digit, Puzzle, SudokuGrid } from '../engine/types.ts';
+import type { CellValue, Digit, Puzzle, SudokuGrid, GameMode } from '../engine/types.ts';
 import { getPeerIndices } from '../engine/grid.ts';
 import { isSolved } from '../engine/validator.ts';
 import { getHint } from '../engine/hints.ts';
@@ -32,6 +32,8 @@ export interface GameState {
     readonly hintsUsed: number;
     /** Max hints allowed this game. null = unlimited. */
     readonly hintLimit: number | null;
+    /** Game mode: 'classic' or 'pen-and-paper'. */
+    readonly gameMode: GameMode;
 }
 
 export const IDLE_STATE: GameState = {
@@ -51,6 +53,7 @@ export const IDLE_STATE: GameState = {
     hintedIndex: null,
     hintsUsed: 0,
     hintLimit: null,
+    gameMode: 'classic',
 };
 
 // ---------------------------------------------------------------------------
@@ -123,6 +126,7 @@ export function createGame(
     mistakeLimit: number | null,
     now: number,
     hintLimit: number | null = null,
+    gameMode: GameMode = 'classic',
 ): GameState {
     return {
         puzzle,
@@ -141,6 +145,7 @@ export function createGame(
         hintedIndex: null,
         hintsUsed: 0,
         hintLimit,
+        gameMode,
     };
 }
 
@@ -169,6 +174,18 @@ export function placeDigit(state: GameState, digit: Digit, now: number = Date.no
 
     const correct = digit === state.puzzle.solution[state.selectedIndex];
     const notes = cloneNotes(state.notes);
+
+    // In pen-and-paper mode: place the digit without any validation feedback,
+    // no peer note removal, and no auto-win. All of that happens via submitSolution.
+    if (state.gameMode === 'pen-and-paper') {
+        return {
+            ...state,
+            ...withUndo(state),
+            board,
+            notes,
+            hintedIndex: null,
+        };
+    }
 
     let mistakeCount = state.mistakeCount;
     let status: GameStatus = state.status;
@@ -349,4 +366,34 @@ export function getElapsedMs(state: GameState, now: number): number {
         return state.elapsedMs + (now - state.startedAt);
     }
     return state.elapsedMs;
+}
+
+/**
+ * Pen-and-paper mode only: validates the fully-filled board against the solution.
+ * - Correct board → transitions to 'won' and freezes the timer.
+ * - Incorrect board or board has empty cells → increments mistakeCount, stays 'playing'.
+ * - No-op if game mode is not 'pen-and-paper' or if the game is not 'playing'.
+ */
+export function submitSolution(
+    state: GameState,
+    now: number = Date.now(),
+): { state: GameState; result: 'won' | 'incorrect' } {
+    if (state.gameMode !== 'pen-and-paper') return { state, result: 'incorrect' };
+    if (state.status !== 'playing') return { state, result: 'incorrect' };
+    if (state.puzzle === null) return { state, result: 'incorrect' };
+    if (state.board.some((v) => v === 0)) return { state, result: 'incorrect' };
+
+    if (isFullyCorrect(state.board, state.puzzle.solution)) {
+        const wonState: GameState = {
+            ...state,
+            status: 'won',
+            ...finalizeIfEnded(state, 'won', now),
+        };
+        return { state: wonState, result: 'won' };
+    }
+
+    return {
+        state: { ...state, mistakeCount: state.mistakeCount + 1 },
+        result: 'incorrect',
+    };
 }

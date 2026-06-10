@@ -98,6 +98,7 @@ function gameStateToRecord(state: GameState): PersistedGame {
 
         hintsUsed: state.hintsUsed,
         hintLimit: state.hintLimit,
+        gameMode: state.gameMode,
     };
 }
 
@@ -141,6 +142,8 @@ function recordToGameState(raw: unknown): GameState | null {
         hintedIndex: null,
         hintsUsed: r.hintsUsed ?? 0,
         hintLimit: r.hintLimit ?? null,
+        // Default to 'classic' for records saved before gameMode was introduced.
+        gameMode: r.gameMode ?? 'classic',
     };
 }
 
@@ -208,6 +211,7 @@ export async function saveCompletedGame(state: GameState): Promise<void> {
             hintsUsed: state.hintsUsed,
             mistakeCount: state.mistakeCount,
             elapsedMs: state.elapsedMs,
+            gameMode: state.gameMode,
         };
         await db.put('completedGames', record, record.id);
     } catch {

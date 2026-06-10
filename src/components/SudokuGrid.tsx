@@ -16,6 +16,8 @@ interface Props {
     onSelectCell: (index: number) => void;
     onDigitInput: (digit: Digit) => void;
     onClear: () => void;
+    /** When true, suppresses all visual assists (peers, conflicts, wrong cells, note conflicts). */
+    isPenAndPaper?: boolean;
 }
 
 interface CompletionWaveState {
@@ -75,9 +77,12 @@ export function SudokuGrid({
     onSelectCell,
     onDigitInput,
     onClear,
+    isPenAndPaper = false,
 }: Props) {
-    const peers = selectedIndex !== null ? new Set(getPeerIndices(selectedIndex)) : new Set<number>();
-    const conflicts = buildConflicts(board);
+    const peers = (!isPenAndPaper && selectedIndex !== null)
+        ? new Set(getPeerIndices(selectedIndex))
+        : new Set<number>();
+    const conflicts = isPenAndPaper ? new Set<number>() : buildConflicts(board);
     const showWrongNoteConflicts = useSettingsStore(
         (state) => state.showWrongNoteConflicts,
     );
@@ -110,6 +115,10 @@ export function SudokuGrid({
     }, [handleKeyDown]);
 
     useEffect(() => {
+        if (isPenAndPaper) {
+            previousBoardRef.current = board;
+            return;
+        }
         const delays = getCompletionWaveDelays(previousBoardRef.current, board, selectedIndex);
 
         if (delays !== null) {
@@ -120,7 +129,7 @@ export function SudokuGrid({
         }
 
         previousBoardRef.current = board;
-    }, [board, selectedIndex]);
+    }, [board, selectedIndex, isPenAndPaper]);
 
     return (
         <div
@@ -145,15 +154,15 @@ export function SudokuGrid({
                         isGiven={givens.has(i)}
                         isSelected={selectedIndex === i}
                         isPeer={selectedIndex !== null && selectedIndex !== i && peers.has(i)}
-                        isSameNumber={selectedIndex !== null && selectedIndex !== i && sameNumberIndices.has(i)}
+                        isSameNumber={!isPenAndPaper && selectedIndex !== null && selectedIndex !== i && sameNumberIndices.has(i)}
                         isConflict={conflicts.has(i)}
-                        isWrong={!givens.has(i) && value !== 0 && value !== solution[i]}
+                        isWrong={!isPenAndPaper && !givens.has(i) && value !== 0 && value !== solution[i]}
                         isHinted={hintedIndices.has(i)}
                         completionAnimation={completionDelayMs === undefined || completionWave === null
                             ? null
                             : { token: completionWave.token, delayMs: completionDelayMs }}
                         notes={cellNotes}
-                        conflictingNotes={showWrongNoteConflicts
+                        conflictingNotes={(!isPenAndPaper && showWrongNoteConflicts)
                             ? getConflictingNotes(board, cellNotes, i)
                             : new Set<Digit>()}
                         onClick={onSelectCell}
