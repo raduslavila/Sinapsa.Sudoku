@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { Logo } from '../assets/Logo.tsx';
-import type { DifficultyId } from '../engine/types.ts';
+import type { DifficultyId, GameMode } from '../engine/types.ts';
 import { DIFFICULTIES } from '../config/difficulties.ts';
 
 interface SavedGameSummary {
     difficultyName: string;
     percentComplete: number;
     elapsedMs: number;
+    gameMode?: 'classic' | 'pen-and-paper';
 }
 
 interface Props {
-    onStart: (id: DifficultyId) => void;
+    onStart: (id: DifficultyId, gameMode?: GameMode) => void;
     savedGame?: SavedGameSummary;
     onContinue?: () => void;
     onDeleteSave?: () => void;
@@ -27,6 +28,7 @@ function formatElapsed(ms: number): string {
 
 export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onStatistics, onSettings }: Props) {
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [penAndPaperDifficulty, setPenAndPaperDifficulty] = useState<DifficultyId>(1);
 
     return (
         <main
@@ -73,6 +75,11 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                             >
                                 <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--color-primary)' }}>
                                     Continue Game
+                                    {savedGame.gameMode === 'pen-and-paper' && (
+                                        <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 600, color: 'var(--color-given)', background: 'var(--color-btn-bg)', borderRadius: 4, padding: '2px 6px', verticalAlign: 'center' }}>
+                                            Pen &amp; Paper
+                                        </span>
+                                    )}
                                 </span>
                                 <span style={{ fontSize: 13, color: '#666' }}>
                                     {savedGame.difficultyName}
@@ -162,7 +169,7 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                 </div>
             )}
 
-            <p style={{ color: '#666', fontSize: 15 }}>Choose a difficulty to start</p>
+            {/* <p style={{ color: '#666', fontSize: 15 }}>Choose a difficulty to start</p> */}
 
             <div
                 style={{
@@ -205,6 +212,69 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                         <span style={{ fontSize: 12, color: '#888' }}>{d.description}</span>
                     </button>
                 ))}
+            </div>
+
+            {/* Pen & Paper mode */}
+            <div
+                style={{
+                    width: '100%',
+                    maxWidth: 360,
+                    background: 'var(--color-surface)',
+                    border: '1.5px solid var(--color-border)',
+                    borderRadius: 12,
+                    padding: '16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 12,
+                }}
+            >
+                <div>
+                    <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--color-primary)', margin: 0 }}>
+                        Pen &amp; Paper
+                    </p>
+                    <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>
+                        Sudoku like you would play it on paper — no hints, no highlights, no badge counters.
+                        Fill the board, then submit your solution.
+                    </p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <select
+                        aria-label="Pen & Paper difficulty"
+                        value={penAndPaperDifficulty}
+                        onChange={(e) => setPenAndPaperDifficulty(Number(e.target.value) as DifficultyId)}
+                        style={{
+                            flex: 1,
+                            padding: '8px 10px',
+                            borderRadius: 8,
+                            border: '1.5px solid var(--color-border)',
+                            background: 'var(--color-bg)',
+                            color: 'var(--color-primary)',
+                            fontSize: 14,
+                            fontWeight: 500,
+                        }}
+                    >
+                        {DIFFICULTIES.map((d) => (
+                            <option key={d.id} value={d.id}>{d.name}</option>
+                        ))}
+                    </select>
+                    <button
+                        type="button"
+                        onClick={() => onStart(penAndPaperDifficulty, 'pen-and-paper')}
+                        style={{
+                            padding: '8px 18px',
+                            borderRadius: 8,
+                            background: 'var(--color-bg)',
+                            border: '1.5px solid var(--color-border)',
+                            color: 'var(--color-primary)',
+                            fontSize: 14,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            flexShrink: 0,
+                        }}
+                    >
+                        Start
+                    </button>
+                </div>
             </div>
 
             {/* Secondary nav */}

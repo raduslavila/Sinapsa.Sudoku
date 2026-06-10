@@ -37,6 +37,7 @@ export interface PersistedGame {
     // Optional — introduced after initial schema, defaults applied on load
     readonly hintsUsed?: number;
     readonly hintLimit?: number | null;
+    readonly gameMode?: 'classic' | 'pen-and-paper';
 }
 
 export interface PersistedSnapshot {
@@ -74,6 +75,7 @@ export interface PersistedCompletedGame {
     readonly hintsUsed?: number;
     readonly mistakeCount: number;
     readonly elapsedMs: number;
+    readonly gameMode?: 'classic' | 'pen-and-paper';
 }
 
 /** Serialized board string → CellValue[]. */

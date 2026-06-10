@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
-import type { Digit, DifficultyId } from '../engine/types.ts';
+import type { Digit, DifficultyId, GameMode } from '../engine/types.ts';
 import { generatePuzzle } from '../engine/generator.ts';
 import { getDifficultyConfig } from '../config/difficulties.ts';
 import { useSettingsStore, effectiveMistakeLimit, effectiveHintLimit } from './settingsStore.ts';
@@ -20,6 +20,7 @@ import {
     hintCell as hintCellAction,
     applyHint as applyHintAction,
     getElapsedMs as getElapsedMsAction,
+    submitSolution as submitSolutionAction,
 } from './gameState.ts';
 import {
     saveActiveGame,
@@ -49,7 +50,7 @@ function persistAfterMove(next: GameState): void {
 
 interface GameStore {
     game: GameState;
-    startGame: (difficultyId: DifficultyId) => void;
+    startGame: (difficultyId: DifficultyId, gameMode?: GameMode) => void;
     /** Load a previously saved game and resume playing. */
     continueGame: (savedState: GameState) => void;
     goHome: () => void;
@@ -65,19 +66,29 @@ interface GameStore {
     hintCell: () => void;
     applyHint: () => void;
     getElapsedMs: () => number;
+    /** Pen-and-paper mode only: validates the board and returns the result. */
+    submitSolution: () => 'won' | 'incorrect';
+    /** Pen-and-paper mode only: save as 'over', delete active game, return to idle. */
+    giveUp: () => Promise<void>;
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
     game: IDLE_STATE,
 
-    startGame: (difficultyId) => {
+    startGame: (difficultyId, gameMode = 'classic') => {
         const seed = nanoid();
         const config = getDifficultyConfig(difficultyId);
         const { mistakeLimitOverrides, hintLimitOverrides } = useSettingsStore.getState();
-        const mistakeLimit = effectiveMistakeLimit(mistakeLimitOverrides, difficultyId, config.defaultMistakeLimit);
-        const hintLimit = effectiveHintLimit(hintLimitOverrides, difficultyId, config.defaultHintLimit);
+        // In pen-and-paper mode: always unlimited mistakes (no auto-game-over),
+        // and no hints regardless of difficulty defaults or user overrides.
+        const mistakeLimit = gameMode === 'pen-and-paper'
+            ? null
+            : effectiveMistakeLimit(mistakeLimitOverrides, difficultyId, config.defaultMistakeLimit);
+        const hintLimit = gameMode === 'pen-and-paper'
+            ? null
+            : effectiveHintLimit(hintLimitOverrides, difficultyId, config.defaultHintLimit);
         const puzzle = generatePuzzle(seed, difficultyId);
-        const next = createGame(puzzle, mistakeLimit, Date.now(), hintLimit);
+        const next = createGame(puzzle, mistakeLimit, Date.now(), hintLimit, gameMode);
         set({ game: next });
         void saveActiveGame(next);
     },
@@ -161,4 +172,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     },
 
     getElapsedMs: () => getElapsedMsAction(get().game, Date.now()),
+
+    submitSolution: () => {
+        let result: 'won' | 'incorrect' = 'incorrect';
+        set((s) => {
+            const { state: next, result: r } = submitSolutionAction(s.game, Date.now());
+            result = r;
+            if (r === 'won') {
+                persistAfterMove(next);
+            } else {
+                void saveActiveGame(next);
+            }
+            return { game: next };
+        });
+        return result;
+    },
+
+    giveUp: async () => {
+        const current = get().game;
+        if (current.puzzle === null) return;
+        const now = Date.now();
+        const frozenElapsedMs =
+            current.startedAt !== null
+                ? current.elapsedMs + (now - current.startedAt)
+                : current.elapsedMs;
+        const gaveUpState: GameState = {
+            ...current,
+            status: 'over',
+            elapsedMs: frozenElapsedMs,
+            startedAt: null,
+        };
+        await saveCompletedGame(gaveUpState);
+        await deleteActiveGame();
+        set({ game: IDLE_STATE });
+    },
 }));

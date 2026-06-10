@@ -136,4 +136,121 @@ describe('computeStatistics', () => {
         expect(stats.byDifficulty[2]?.totalHintsUsed).toBe(2);
         expect(stats.byDifficulty[2]?.totalMistakes).toBe(5);
     });
+
+    it('returns empty byPenAndPaper for all-classic games', () => {
+        const stats = computeStatistics([makeGame()]);
+        expect(stats.byPenAndPaper).toEqual({});
+    });
+
+    // Backwards-compat: records without gameMode are treated as classic.
+    it('legacy record without gameMode goes into byDifficulty, not byPenAndPaper', () => {
+        const legacy = makeGame({ id: 'old', difficultyId: 1, status: 'won', elapsedMs: 60000 });
+        // Confirm no gameMode field (makeGame does not set it).
+        expect((legacy as Record<string, unknown>).gameMode).toBeUndefined();
+        const stats = computeStatistics([legacy]);
+        expect(stats.byDifficulty[1]?.played).toBe(1);
+        expect(stats.byPenAndPaper[1]).toBeUndefined();
+        expect(stats.totalPlayed).toBe(1);
+        expect(stats.totalWon).toBe(1);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Pen-and-paper statistics
+// ---------------------------------------------------------------------------
+
+describe('computeStatistics pen-and-paper', () => {
+    function makePapGame(
+        overrides: Partial<PersistedCompletedGame> = {},
+    ): PersistedCompletedGame {
+        return {
+            id: 'pap-id',
+            schemaVersion: 1,
+            updatedAt: 1000,
+            seed: 'seed',
+            difficultyId: 1,
+            status: 'won',
+            hintsUsed: 0,
+            mistakeCount: 0,
+            elapsedMs: 60000,
+            gameMode: 'pen-and-paper',
+            ...overrides,
+        };
+    }
+
+    it('P&P games go into byPenAndPaper, not byDifficulty', () => {
+        const stats = computeStatistics([makePapGame()]);
+        expect(stats.byPenAndPaper[1]?.played).toBe(1);
+        expect(stats.byDifficulty[1]).toBeUndefined();
+    });
+
+    it('P&P won game increments won count', () => {
+        const stats = computeStatistics([makePapGame({ status: 'won' })]);
+        expect(stats.byPenAndPaper[1]?.won).toBe(1);
+    });
+
+    it('P&P over game does not increment won count', () => {
+        const stats = computeStatistics([makePapGame({ status: 'over' })]);
+        expect(stats.byPenAndPaper[1]?.won).toBe(0);
+        expect(stats.byPenAndPaper[1]?.played).toBe(1);
+    });
+
+    it('totalSubmitMistakes sums mistakeCount from P&P records', () => {
+        const stats = computeStatistics([
+            makePapGame({ id: 'a', mistakeCount: 2 }),
+            makePapGame({ id: 'b', mistakeCount: 3 }),
+        ]);
+        expect(stats.byPenAndPaper[1]?.totalSubmitMistakes).toBe(5);
+    });
+
+    it('P&P records do not affect totalPlayed / totalWon', () => {
+        const stats = computeStatistics([
+            makeGame({ id: 'classic', difficultyId: 2, status: 'won', elapsedMs: 60000 }),
+            makePapGame({ id: 'pap', difficultyId: 2 }),
+        ]);
+        expect(stats.totalPlayed).toBe(1);
+        expect(stats.totalWon).toBe(1);
+    });
+
+    it('mixed classic + P&P at same difficultyId are separated', () => {
+        const stats = computeStatistics([
+            makeGame({ id: 'c', difficultyId: 3, status: 'won', elapsedMs: 90000, mistakeCount: 1 }),
+            makePapGame({ id: 'p', difficultyId: 3, mistakeCount: 4 }),
+        ]);
+        expect(stats.byDifficulty[3]?.played).toBe(1);
+        expect(stats.byDifficulty[3]?.totalMistakes).toBe(1);
+        expect(stats.byPenAndPaper[3]?.played).toBe(1);
+        expect(stats.byPenAndPaper[3]?.totalSubmitMistakes).toBe(4);
+    });
+
+    it('separates P&P rows by difficultyId', () => {
+        const stats = computeStatistics([
+            makePapGame({ id: 'a', difficultyId: 1 }),
+            makePapGame({ id: 'b', difficultyId: 5 }),
+        ]);
+        expect(stats.byPenAndPaper[1]?.played).toBe(1);
+        expect(stats.byPenAndPaper[5]?.played).toBe(1);
+    });
+
+    it('bestTimeMs is null when no won games', () => {
+        const stats = computeStatistics([makePapGame({ status: 'over', elapsedMs: 30000 })]);
+        expect(stats.byPenAndPaper[1]?.bestTimeMs).toBeNull();
+        expect(stats.byPenAndPaper[1]?.avgTimeMs).toBeNull();
+    });
+
+    it('bestTimeMs picks the minimum elapsed of won games', () => {
+        const stats = computeStatistics([
+            makePapGame({ id: 'a', status: 'won', elapsedMs: 90000 }),
+            makePapGame({ id: 'b', status: 'won', elapsedMs: 60000 }),
+        ]);
+        expect(stats.byPenAndPaper[1]?.bestTimeMs).toBe(60000);
+    });
+
+    it('avgTimeMs averages elapsed of won games', () => {
+        const stats = computeStatistics([
+            makePapGame({ id: 'a', status: 'won', elapsedMs: 60000 }),
+            makePapGame({ id: 'b', status: 'won', elapsedMs: 120000 }),
+        ]);
+        expect(stats.byPenAndPaper[1]?.avgTimeMs).toBe(90000);
+    });
 });

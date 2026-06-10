@@ -22,6 +22,10 @@ interface Props {
     onResume: () => void;
     onHome: () => void;
     onNewGame: () => void;
+    /** Pen-and-paper mode only: validate the board and return the result. */
+    onSubmitSolution?: () => 'won' | 'incorrect';
+    /** Pen-and-paper mode only: give up the current game. */
+    onGiveUp?: () => void;
 }
 
 const GRID_WIDTH = 'calc(var(--cell-size) * 9 + 2px)';
@@ -52,17 +56,25 @@ export function GameScreen({
     onResume,
     onHome,
     onNewGame,
+    onSubmitSolution,
+    onGiveUp,
 }: Props) {
     const [dismissedCompletionSeed, setDismissedCompletionSeed] = useState<string | null>(null);
+    const [showSubmitModal, setShowSubmitModal] = useState(false);
 
     if (game.puzzle === null) return null;
     const puzzle = game.puzzle;
 
+    const isPenAndPaper = game.gameMode === 'pen-and-paper';
+    const isPenAndPaperWon = isPenAndPaper && game.status === 'won';
+    const allCellsFilled = isPenAndPaper && game.status === 'playing' && game.board.every((v) => v !== 0);
+
     const diffName = getDifficultyConfig(puzzle.difficultyId).name;
     const isPaused = game.status === 'paused';
     const isOver = game.status === 'over' || game.status === 'won';
+    // Classic win popup only — P&P wins use screenshot mode instead.
     const showCompletionPopup =
-        game.status === 'won' && dismissedCompletionSeed !== puzzle.seed;
+        game.status === 'won' && !isPenAndPaper && dismissedCompletionSeed !== puzzle.seed;
     const padDisabled = isPaused || isOver;
     const remainingHints =
         game.hintLimit === null ? null : Math.max(0, game.hintLimit - game.hintsUsed);
@@ -76,7 +88,7 @@ export function GameScreen({
         game.hintedIndex !== null ? new Set([game.hintedIndex]) : new Set();
 
     const sameNumberIndices: ReadonlySet<number> =
-        game.selectedIndex !== null && game.board[game.selectedIndex] !== 0
+        !isPenAndPaper && game.selectedIndex !== null && game.board[game.selectedIndex] !== 0
             ? new Set(game.board.reduce<number[]>((acc, val, idx) => {
                 if (val === game.board[game.selectedIndex!] && idx !== game.selectedIndex) {
                     acc.push(idx);
@@ -97,6 +109,18 @@ export function GameScreen({
             });
         }
         nextAction?.();
+    };
+
+    const handleSubmitSolution = () => {
+        const result = onSubmitSolution?.();
+        if (result === 'incorrect') {
+            setShowSubmitModal(true);
+        }
+    };
+
+    const handleGiveUp = () => {
+        setShowSubmitModal(false);
+        onGiveUp?.();
     };
 
     return (
@@ -122,7 +146,7 @@ export function GameScreen({
                 <button
                     type="button"
                     aria-label="Back to home"
-                    onClick={onHome}
+                    onClick={isPenAndPaperWon ? () => acknowledgeCompletion(onHome) : onHome}
                     style={{
                         fontSize: 13,
                         color: 'var(--color-primary)',
@@ -136,7 +160,14 @@ export function GameScreen({
                     Home
                 </button>
 
-                <span style={{ fontWeight: 600, fontSize: 15 }}>{diffName}</span>
+                <span style={{ fontWeight: 600, fontSize: 15 }}>
+                    {diffName}
+                    {isPenAndPaper && (
+                        <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 600, color: 'var(--color-given)', background: 'var(--color-btn-bg)', borderRadius: 4, padding: '2px 6px', verticalAlign: 'middle' }}>
+                            Pen &amp; Paper
+                        </span>
+                    )}
+                </span>
 
                 <button
                     type="button"
@@ -204,6 +235,26 @@ export function GameScreen({
                     </div>
                 )}
 
+                {isPenAndPaperWon && (
+                    <div
+                        role="status"
+                        style={{
+                            width: '100%',
+                            maxWidth: GRID_WIDTH,
+                            background: '#f0fff6',
+                            border: '1.5px solid #2b7a45',
+                            borderRadius: 8,
+                            padding: '10px 16px',
+                            textAlign: 'center',
+                            fontWeight: 600,
+                            color: '#2b7a45',
+                            verticalAlign: 'unset',
+                        }}
+                    >
+                        ✓ Puzzle solved! Screenshot your board, then tap Home.
+                    </div>
+                )}
+
                 <div
                     style={{
                         position: 'relative',
@@ -237,9 +288,10 @@ export function GameScreen({
                             selectedIndex={game.selectedIndex}
                             hintedIndices={hintedIndices}
                             sameNumberIndices={sameNumberIndices}
-                            onSelectCell={onSelectCell}
+                            onSelectCell={isPenAndPaperWon ? () => undefined : onSelectCell}
                             onDigitInput={onDigitInput}
                             onClear={onClear}
+                            isPenAndPaper={isPenAndPaper}
                         />
                     )}
 
@@ -393,9 +445,94 @@ export function GameScreen({
                     disabled={padDisabled}
                     remainingHints={remainingHints}
                     remainingDigitCounts={remainingDigitCounts}
+                    isPenAndPaper={isPenAndPaper}
+                    allCellsFilled={allCellsFilled}
+                    onSubmitSolution={handleSubmitSolution}
                 />
 
             </div>
+
+            {/* Submit-failure modal (P&P mode) */}
+            {showSubmitModal && (
+                <div
+                    role="alertdialog"
+                    aria-modal="true"
+                    aria-label="Incorrect solution"
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'rgba(8, 16, 15, 0.72)',
+                        zIndex: 100,
+                        padding: 16,
+                    }}
+                >
+                    <div
+                        style={{
+                            width: '100%',
+                            maxWidth: 320,
+                            background: 'var(--color-bg)',
+                            border: '1.5px solid var(--color-border)',
+                            borderRadius: 16,
+                            padding: '20px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 12,
+                            boxShadow: '0 14px 40px rgba(0,0,0,0.28)',
+                        }}
+                    >
+                        <p style={{ fontWeight: 700, fontSize: 18, color: 'var(--color-wrong)', margin: 0 }}>
+                            Not quite right
+                        </p>
+                        <p style={{ fontSize: 14, color: 'var(--color-given)', margin: 0 }}>
+                            Your solution has errors. Keep trying!
+                            {game.mistakeCount > 0 && (
+                                <span style={{ display: 'block', marginTop: 4, color: 'var(--color-wrong)' }}>
+                                    {formatUsage(game.mistakeCount, 'submit')}
+                                </span>
+                            )}
+                        </p>
+                        <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+                            <button
+                                type="button"
+                                onClick={() => setShowSubmitModal(false)}
+                                style={{
+                                    flex: 1,
+                                    padding: '10px 12px',
+                                    borderRadius: 10,
+                                    border: '1.5px solid var(--color-primary)',
+                                    background: 'var(--color-primary)',
+                                    color: 'var(--color-bg)',
+                                    fontSize: 14,
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                Continue
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleGiveUp}
+                                style={{
+                                    flex: 1,
+                                    padding: '10px 12px',
+                                    borderRadius: 10,
+                                    border: '1.5px solid var(--color-wrong)',
+                                    background: 'transparent',
+                                    color: 'var(--color-wrong)',
+                                    fontSize: 14,
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                Give Up
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }

@@ -13,6 +13,12 @@ interface Props {
     disabled: boolean;
     remainingHints: number | null;
     remainingDigitCounts: RemainingDigitCounts;
+    /** When true, applies pen-and-paper mode rules (no hints, no badges, Submit Solution). */
+    isPenAndPaper?: boolean;
+    /** When true (P&P mode only), shows the Submit Solution button. */
+    allCellsFilled?: boolean;
+    /** Called when the user presses Submit Solution (P&P mode only). */
+    onSubmitSolution?: () => void;
 }
 
 const DIGITS: Digit[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -102,14 +108,19 @@ export function NumberPad({
     disabled,
     remainingHints,
     remainingDigitCounts,
+    isPenAndPaper = false,
+    allCellsFilled = false,
+    onSubmitSolution,
 }: Props) {
     const hintsUnavailable = remainingHints === 0;
     const hintDisabled = disabled || hintsUnavailable;
     const hintLabelSuffix = remainingHints === null ? '' : ` (${remainingHints} left)`;
 
-    const isNumberBadgeDisabled = useSettingsStore(
+    const isNumberBadgeDisabledSetting = useSettingsStore(
         (state) => state.disableNumberPadBadge,
     );
+    // P&P mode always suppresses digit badges regardless of the setting.
+    const isNumberBadgeDisabled = isPenAndPaper || isNumberBadgeDisabledSetting;
 
     return (
         <div
@@ -146,12 +157,14 @@ export function NumberPad({
                 );
             })}
 
-            {/* Action row — 5 buttons spanning all 9 columns */}
+            {/* Action row */}
             <div
                 style={{
                     gridColumn: '1 / -1',
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(5, 1fr)',
+                    gridTemplateColumns: isPenAndPaper
+                        ? (allCellsFilled ? '1fr 1fr 1fr 2fr' : 'repeat(3, 1fr)')
+                        : 'repeat(5, 1fr)',
                     gap: 6,
                 }}
             >
@@ -194,41 +207,67 @@ export function NumberPad({
                     Notes
                 </button>
 
-                <button
-                    type="button"
-                    aria-label={`Hint — highlight the next cell to fill${hintLabelSuffix}`}
-                    disabled={hintDisabled}
-                    onClick={onHintSelect}
-                    style={withDisabledStyle(actionBtn, hintDisabled)}
-                >
-                    <span>Hint</span>
-                    {remainingHints !== null && (
-                        <span aria-hidden="true" style={withDisabledBadgeStyle(hintBadge, hintDisabled)}>
-                            {remainingHints}
-                        </span>
-                    )}
-                </button>
+                {isPenAndPaper ? (
+                    allCellsFilled ? (
+                        <button
+                            type="button"
+                            aria-label="Submit solution"
+                            disabled={disabled}
+                            onClick={onSubmitSolution}
+                            style={withDisabledStyle(
+                                {
+                                    ...actionBtn,
+                                    background: 'var(--color-primary)',
+                                    color: 'var(--color-bg)',
+                                    fontWeight: '700',
+                                    border: '2px solid transparent',
+                                    aspectRatio: 'auto',
+                                },
+                                disabled,
+                            )}
+                        >
+                            Submit
+                        </button>
+                    ) : null
+                ) : (
+                    <>
+                        <button
+                            type="button"
+                            aria-label={`Hint — highlight the next cell to fill${hintLabelSuffix}`}
+                            disabled={hintDisabled}
+                            onClick={onHintSelect}
+                            style={withDisabledStyle(actionBtn, hintDisabled)}
+                        >
+                            <span>Hint</span>
+                            {remainingHints !== null && (
+                                <span aria-hidden="true" style={withDisabledBadgeStyle(hintBadge, hintDisabled)}>
+                                    {remainingHints}
+                                </span>
+                            )}
+                        </button>
 
-                <button
-                    type="button"
-                    aria-label={`Hint+ — fill the next cell with the correct digit${hintLabelSuffix}`}
-                    disabled={hintDisabled}
-                    onClick={onHintApply}
-                    style={withDisabledStyle(
-                        {
-                            ...actionBtn,
-                            color: 'var(--color-primary)',
-                        },
-                        hintDisabled,
-                    )}
-                >
-                    <span>Hint+</span>
-                    {remainingHints !== null && (
-                        <span aria-hidden="true" style={withDisabledBadgeStyle(hintBadge, hintDisabled)}>
-                            {remainingHints}
-                        </span>
-                    )}
-                </button>
+                        <button
+                            type="button"
+                            aria-label={`Hint+ — fill the next cell with the correct digit${hintLabelSuffix}`}
+                            disabled={hintDisabled}
+                            onClick={onHintApply}
+                            style={withDisabledStyle(
+                                {
+                                    ...actionBtn,
+                                    color: 'var(--color-primary)',
+                                },
+                                hintDisabled,
+                            )}
+                        >
+                            <span>Hint+</span>
+                            {remainingHints !== null && (
+                                <span aria-hidden="true" style={withDisabledBadgeStyle(hintBadge, hintDisabled)}>
+                                    {remainingHints}
+                                </span>
+                            )}
+                        </button>
+                    </>
+                )}
             </div>
         </div>
     );

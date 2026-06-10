@@ -2,6 +2,7 @@ export type Digit = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 export type CellValue = Digit | 0;
 export type SudokuGrid = readonly CellValue[];
 export type DifficultyId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+export type GameMode = 'classic' | 'pen-and-paper';
 
 export interface Puzzle {
     readonly seed: string;

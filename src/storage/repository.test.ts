@@ -196,6 +196,63 @@ describe('persistedCompletedGameSchema', () => {
     it('rejects negative elapsedMs', () => {
         expect(persistedCompletedGameSchema.safeParse({ ...validCompleted, elapsedMs: -1 }).success).toBe(false);
     });
+
+    it('accepts pen-and-paper gameMode', () => {
+        expect(persistedCompletedGameSchema.safeParse({ ...validCompleted, gameMode: 'pen-and-paper' }).success).toBe(true);
+    });
+
+    it('accepts classic gameMode', () => {
+        expect(persistedCompletedGameSchema.safeParse({ ...validCompleted, gameMode: 'classic' }).success).toBe(true);
+    });
+
+    it('accepts record without gameMode (backwards compat)', () => {
+        const noMode = { ...validCompleted };
+        expect(persistedCompletedGameSchema.safeParse(noMode).success).toBe(true);
+    });
+
+    it('rejects unknown gameMode', () => {
+        expect(persistedCompletedGameSchema.safeParse({ ...validCompleted, gameMode: 'timed' }).success).toBe(false);
+    });
+});
+
+describe('persistedGameSchema gameMode field', () => {
+    const BOARD_STR_G = serializeBoardArray(EASY_PUZZLE);
+    const SOL_STR_G = serializeBoardArray(SOLVED_GRID);
+
+    const baseGame = {
+        id: 'active' as const,
+        schemaVersion: 1,
+        updatedAt: Date.now(),
+        seed: 'test-seed',
+        difficultyId: 2 as const,
+        puzzleGrid: BOARD_STR_G,
+        solutionGrid: SOL_STR_G,
+        givens: [0, 1],
+        board: BOARD_STR_G,
+        notes: [] as [],
+        status: 'playing' as const,
+        mistakeCount: 0,
+        mistakeLimit: null,
+        elapsedMs: 0,
+        undoStack: [] as [],
+        redoStack: [] as [],
+    };
+
+    it('accepts active game without gameMode (legacy backwards compat)', () => {
+        expect(persistedGameSchema.safeParse(baseGame).success).toBe(true);
+    });
+
+    it('accepts active game with gameMode pen-and-paper', () => {
+        expect(persistedGameSchema.safeParse({ ...baseGame, gameMode: 'pen-and-paper' }).success).toBe(true);
+    });
+
+    it('accepts active game with gameMode classic', () => {
+        expect(persistedGameSchema.safeParse({ ...baseGame, gameMode: 'classic' }).success).toBe(true);
+    });
+
+    it('rejects unknown gameMode', () => {
+        expect(persistedGameSchema.safeParse({ ...baseGame, gameMode: 'survival' }).success).toBe(false);
+    });
 });
 
 describe('settingsSchema', () => {
