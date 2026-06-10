@@ -146,7 +146,7 @@ describe('computeStatistics', () => {
     it('legacy record without gameMode goes into byDifficulty, not byPenAndPaper', () => {
         const legacy = makeGame({ id: 'old', difficultyId: 1, status: 'won', elapsedMs: 60000 });
         // Confirm no gameMode field (makeGame does not set it).
-        expect((legacy as Record<string, unknown>).gameMode).toBeUndefined();
+        expect((legacy as unknown as Record<string, unknown>).gameMode).toBeUndefined();
         const stats = computeStatistics([legacy]);
         expect(stats.byDifficulty[1]?.played).toBe(1);
         expect(stats.byPenAndPaper[1]).toBeUndefined();
