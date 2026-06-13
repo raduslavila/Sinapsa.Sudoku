@@ -163,7 +163,8 @@ export function NumberPad({
                     gridColumn: '1 / -1',
                     display: 'grid',
                     gridTemplateColumns: isPenAndPaper
-                        ? (allCellsFilled ? '1fr 1fr 1fr 2fr' : 'repeat(3, 1fr)')
+                        //? (allCellsFilled ? '1fr 1fr 1fr 2fr' : 'repeat(3, 1fr)')
+                        ? '1fr 1fr 1fr 2fr'
                         : 'repeat(5, 1fr)',
                     gap: 6,
                 }}
@@ -208,27 +209,25 @@ export function NumberPad({
                 </button>
 
                 {isPenAndPaper ? (
-                    allCellsFilled ? (
-                        <button
-                            type="button"
-                            aria-label="Submit solution"
-                            disabled={disabled}
-                            onClick={onSubmitSolution}
-                            style={withDisabledStyle(
-                                {
-                                    ...actionBtn,
-                                    background: 'var(--color-primary)',
-                                    color: 'var(--color-bg)',
-                                    fontWeight: '700',
-                                    border: '2px solid transparent',
-                                    aspectRatio: 'auto',
-                                },
-                                disabled,
-                            )}
-                        >
-                            Submit
-                        </button>
-                    ) : null
+                    <button
+                        type="button"
+                        aria-label="Submit solution"
+                        disabled={!allCellsFilled}
+                        onClick={onSubmitSolution}
+                        style={withDisabledStyle(
+                            {
+                                ...actionBtn,
+                                background: allCellsFilled ? 'var(--color-primary)' : 'var(--color-btn-bg)',
+                                //color: 'var(--color-bg)',
+                                // fontWeight: '700',
+                                // border: '2px solid transparent',
+                                aspectRatio: 'auto',
+                            },
+                            !allCellsFilled,
+                        )}
+                    >
+                        Submit
+                    </button>
                 ) : (
                     <>
                         <button

@@ -234,7 +234,6 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                     </p>
                     <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>
                         Sudoku like you would play it on paper — no hints, no highlights, no badge counters.
-                        Fill the board, then submit your solution.
                     </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
