@@ -130,7 +130,7 @@ export function GameScreen({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                padding: '12px 8px 0',
+                padding: '2dvh 1dvh 0',
                 width: '100%',
             }}
         >
@@ -148,22 +148,22 @@ export function GameScreen({
                     aria-label="Back to home"
                     onClick={isPenAndPaperWon ? () => acknowledgeCompletion(onHome) : onHome}
                     style={{
-                        fontSize: 13,
+                        fontSize: '2dvh',
                         color: 'var(--color-primary)',
                         fontWeight: 600,
-                        padding: '5px 12px',
-                        borderRadius: 6,
+                        padding: '0.5dvh 1dvh',
+                        borderRadius: '0.5dvh',
                         background: 'var(--color-selected)',
-                        border: '1.5px solid var(--color-primary)',
+                        border: '0.15dvh solid var(--color-primary)',
                     }}
                 >
                     Home
                 </button>
 
-                <span style={{ fontWeight: 600, fontSize: 15 }}>
+                <span style={{ fontWeight: 600, fontSize: '2dvh' }}>
                     {diffName}
                     {isPenAndPaper && (
-                        <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 600, color: 'var(--color-given)', background: 'var(--color-btn-bg)', borderRadius: 4, padding: '2px 6px', verticalAlign: 'middle' }}>
+                        <span style={{ marginLeft: '1dvh', fontSize: '1.5dvh', fontWeight: 600, color: 'var(--color-given)', background: 'var(--color-btn-bg)', borderRadius: '0.5dvh', padding: '0.5dvh 1dvh', verticalAlign: 'middle' }}>
                             Pen &amp; Paper
                         </span>
                     )}
@@ -175,13 +175,13 @@ export function GameScreen({
                     onClick={isPaused ? onResume : onPause}
                     disabled={isOver}
                     style={{
-                        fontSize: 13,
-                        color: isPaused ? 'var(--color-bg)' : 'var(--color-primary)',
+                        fontSize: '2dvh',
+                        color: 'var(--color-primary)',
                         fontWeight: 600,
-                        padding: '5px 12px',
-                        borderRadius: 6,
-                        background: isPaused ? 'var(--color-primary)' : 'var(--color-selected)',
-                        border: '1.5px solid var(--color-primary)',
+                        padding: '0.5dvh 1dvh',
+                        borderRadius: '0.5dvh',
+                        background: 'var(--color-selected)',
+                        border: '0.15dvh solid var(--color-primary)',
                         opacity: isOver ? 0.4 : 1,
                     }}
                 >
@@ -196,7 +196,7 @@ export function GameScreen({
                     justifyContent: 'space-between',
                     width: '100%',
                     maxWidth: GRID_WIDTH,
-                    padding: '4px 4px',
+                    padding: '0.5dvh 1dvh',
                 }}
             >
                 <MistakeCounter count={game.mistakeCount} limit={game.mistakeLimit} />
@@ -223,9 +223,9 @@ export function GameScreen({
                             width: '100%',
                             maxWidth: GRID_WIDTH,
                             background: '#fde8e8',
-                            border: '1.5px solid var(--color-wrong)',
-                            borderRadius: 8,
-                            padding: '10px 16px',
+                            border: '0.15dvh solid var(--color-wrong)',
+                            borderRadius: '0.5dvh',
+                            padding: '1dvh 1.6dvh',
                             textAlign: 'center',
                             fontWeight: 600,
                             color: 'var(--color-wrong)',
@@ -242,9 +242,9 @@ export function GameScreen({
                             width: '100%',
                             maxWidth: GRID_WIDTH,
                             background: '#f0fff6',
-                            border: '1.5px solid #2b7a45',
-                            borderRadius: 8,
-                            padding: '10px 16px',
+                            border: '0.15dvh solid #2b7a45',
+                            borderRadius: '0.5dvh',
+                            padding: '1dvh 1.6dvh',
                             textAlign: 'center',
                             fontWeight: 600,
                             color: '#2b7a45',
@@ -258,8 +258,6 @@ export function GameScreen({
                 <div
                     style={{
                         position: 'relative',
-                        width: GRID_WIDTH,
-                        height: GRID_WIDTH,
                     }}
                 >
                     {isPaused ? (
@@ -271,9 +269,9 @@ export function GameScreen({
                                 width: '100%',
                                 height: '100%',
                                 background: 'rgba(200,200,200,0.5)',
-                                borderRadius: 4,
+                                borderRadius: '0.5dvh',
                                 fontWeight: 600,
-                                fontSize: 20,
+                                fontSize: '2dvh',
                                 color: '#555',
                             }}
                         >
@@ -348,28 +346,28 @@ export function GameScreen({
                                 </button>
                                 <div
                                     style={{
-                                        fontSize: 12,
+                                        fontSize: '1.2dvh',
                                         fontWeight: 800,
-                                        letterSpacing: 1.6,
+                                        letterSpacing: '0.16dvh',
                                         textTransform: 'uppercase',
                                         color: '#2b7a45',
-                                        marginBottom: 8,
+                                        marginBottom: '0.8dvh',
                                     }}
                                 >
                                     {isFlawless ? 'Flawless' : 'Congratulations'}
                                 </div>
                                 <div
                                     style={{
-                                        fontSize: 24,
+                                        fontSize: '2dvh',
                                         fontWeight: 800,
-                                        marginBottom: 10,
+                                        marginBottom: '1dvh',
                                     }}
                                 >
                                     {completionTime}
                                 </div>
                                 <p
                                     style={{
-                                        fontSize: 14,
+                                        fontSize: '1.4dvh',
                                         lineHeight: 1.45,
                                     }}
                                 >

@@ -26,7 +26,7 @@
   --color-unit-complete: color-mix(in srgb, var(--color-accent) 24%, white);
 
   /* (100vw - container padding 16px) / 9 cells, clamped 36–52px */
-  --cell-size: clamp(36px, calc((min(100vw, 480px) - 16px) / 9), 52px);
+  --cell-size: clamp(24px, calc((min(100dvw, 640px) - 24px) / 9), 96px);
 
   font-family: system-ui, -apple-system, sans-serif;
   font-size: 16px;

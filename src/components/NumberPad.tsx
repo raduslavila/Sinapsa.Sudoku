@@ -49,8 +49,7 @@ const digitBadge: React.CSSProperties = {
     position: 'absolute',
     top: 1,
     right: 1,
-    minWidth: 14,
-    height: 14,
+    height: '1.5dvh',
     padding: '0 3px',
     borderRadius: 999,
     display: 'flex',
@@ -58,19 +57,13 @@ const digitBadge: React.CSSProperties = {
     justifyContent: 'center',
     background: 'var(--color-selected)',
     color: 'var(--color-primary)',
-    fontSize: 8,
+    fontSize: '1.5dvh',
     fontWeight: '700',
-    lineHeight: 1,
+    lineHeight: '1.5dvh',
 };
 
 const hintBadge: React.CSSProperties = {
     ...digitBadge,
-    top: 2,
-    right: 2,
-    minWidth: 16,
-    height: 16,
-    padding: '0 4px',
-    fontSize: 9,
 };
 
 function withDisabledStyle(

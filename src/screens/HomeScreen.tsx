@@ -37,137 +37,137 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                padding: '32px 16px',
-                gap: 24,
+                padding: '2dvh 2dvh',
+                gap: '2dvh',
             }}
         >
-            <Logo size={300} />
+            <Logo height="10dvh" />
 
             {/* Continue Game card */}
-            {savedGame && (
-                <div
-                    style={{
-                        width: '100%',
-                        maxWidth: 360,
-                        background: 'var(--color-surface)',
-                        border: '1.5px solid var(--color-primary)',
-                        borderRadius: 12,
-                        overflow: 'hidden',
-                    }}
-                >
-                    {!confirmDelete ? (
-                        <div style={{ display: 'flex', alignItems: 'stretch' }}>
-                            {/* Continue button */}
-                            <button
-                                type="button"
-                                onClick={onContinue}
-                                style={{
-                                    flex: 1,
-                                    padding: '14px 16px',
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    textAlign: 'left',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: 4,
-                                }}
-                            >
-                                <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--color-primary)' }}>
-                                    Continue Game
-                                    {savedGame.gameMode === 'pen-and-paper' && (
-                                        <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 600, color: 'var(--color-given)', background: 'var(--color-btn-bg)', borderRadius: 4, padding: '2px 6px', verticalAlign: 'center' }}>
-                                            Pen &amp; Paper
-                                        </span>
-                                    )}
-                                </span>
-                                <span style={{ fontSize: 13, color: '#666' }}>
-                                    {savedGame.difficultyName}
-                                    &ensp;·&ensp;
-                                    {savedGame.percentComplete}% complete
-                                    &ensp;·&ensp;
-                                    {formatElapsed(savedGame.elapsedMs)}
-                                </span>
-                            </button>
-
-                            {/* Delete button */}
-                            <button
-                                type="button"
-                                aria-label="Delete saved game"
-                                onClick={() => setConfirmDelete(true)}
-                                style={{
-                                    padding: '0 14px',
-                                    background: 'none',
-                                    border: 'none',
-                                    borderLeft: '1px solid var(--color-border)',
-                                    cursor: 'pointer',
-                                    fontSize: 18,
-                                    color: '#999',
-                                    lineHeight: 1,
-                                    flexShrink: 0,
-                                }}
-                                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-wrong)'; }}
-                                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#999'; }}
-                            >
-                                ×
-                            </button>
-                        </div>
-                    ) : (
-                        /* Inline confirmation */
-                        <div
-                            style={{
-                                padding: '14px 16px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 10,
-                            }}
-                        >
-                            <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-given)' }}>
-                                Delete saved game?
-                            </span>
-                            <div style={{ display: 'flex', gap: 8 }}>
+            {
+                savedGame && (
+                    <div
+                        style={{
+                            width: '100%',
+                            background: 'var(--color-surface)',
+                            border: '1.5px solid var(--color-primary)',
+                            borderRadius: '2dvh',
+                            overflow: 'hidden',
+                        }}
+                    >
+                        {!confirmDelete ? (
+                            <div style={{ display: 'flex', alignItems: 'stretch' }}>
+                                {/* Continue button */}
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        setConfirmDelete(false);
-                                        onDeleteSave?.();
-                                    }}
+                                    onClick={onContinue}
                                     style={{
                                         flex: 1,
-                                        padding: '8px',
-                                        borderRadius: 8,
-                                        border: '1.5px solid var(--color-wrong)',
+                                        padding: '2dvh 2dvh',
                                         background: 'none',
-                                        color: 'var(--color-wrong)',
-                                        fontWeight: 600,
-                                        fontSize: 14,
+                                        border: 'none',
                                         cursor: 'pointer',
+                                        textAlign: 'left',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '0.5dvh',
                                     }}
                                 >
-                                    Yes, delete
+                                    <span style={{ fontWeight: 700, fontSize: '2dvh', color: 'var(--color-primary)' }}>
+                                        Continue Game
+                                        {savedGame.gameMode === 'pen-and-paper' && (
+                                            <span style={{ marginLeft: 8, fontSize: '1.5dvh', fontWeight: 600, color: 'var(--color-given)', background: 'var(--color-btn-bg)', borderRadius: 4, padding: '2px 6px', verticalAlign: 'center' }}>
+                                                Pen &amp; Paper
+                                            </span>
+                                        )}
+                                    </span>
+                                    <span style={{ fontSize: '1.5dvh', color: '#666' }}>
+                                        {savedGame.difficultyName}
+                                        &ensp;·&ensp;
+                                        {savedGame.percentComplete}% complete
+                                        &ensp;·&ensp;
+                                        {formatElapsed(savedGame.elapsedMs)}
+                                    </span>
                                 </button>
+
+                                {/* Delete button */}
                                 <button
                                     type="button"
-                                    onClick={() => setConfirmDelete(false)}
+                                    aria-label="Delete saved game"
+                                    onClick={() => setConfirmDelete(true)}
                                     style={{
-                                        flex: 1,
-                                        padding: '8px',
-                                        borderRadius: 8,
-                                        border: '1.5px solid var(--color-border)',
+                                        padding: '0 2dvh',
                                         background: 'none',
-                                        color: 'var(--color-given)',
-                                        fontWeight: 600,
-                                        fontSize: 14,
+                                        border: 'none',
+                                        borderLeft: '1px solid var(--color-border)',
                                         cursor: 'pointer',
+                                        fontSize: '2dvh',
+                                        color: '#999',
+                                        lineHeight: '1dvh',
+                                        flexShrink: 0,
                                     }}
+                                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-wrong)'; }}
+                                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#999'; }}
                                 >
-                                    No, keep it
+                                    ×
                                 </button>
                             </div>
-                        </div>
-                    )}
-                </div>
-            )}
+                        ) : (
+                            /* Inline confirmation */
+                            <div
+                                style={{
+                                    padding: '2dvh 2dvh',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                }}
+                            >
+                                <span style={{ fontSize: '2dvh', fontWeight: 600, color: 'var(--color-given)' }}>
+                                    Delete saved game?
+                                </span>
+                                <div style={{ display: 'flex', gap: '2dvh' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setConfirmDelete(false);
+                                            onDeleteSave?.();
+                                        }}
+                                        style={{
+                                            flex: 1,
+                                            padding: '1dvh',
+                                            borderRadius: '1dvh',
+                                            border: '1.5px solid var(--color-wrong)',
+                                            background: 'none',
+                                            color: 'var(--color-wrong)',
+                                            fontWeight: 600,
+                                            fontSize: '1.5dvh',
+                                            cursor: 'pointer',
+                                        }}
+                                    >
+                                        Yes, delete
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setConfirmDelete(false)}
+                                        style={{
+                                            flex: 1,
+                                            padding: '1dvh',
+                                            borderRadius: '1dvh',
+                                            border: '1.5px solid var(--color-border)',
+                                            background: 'none',
+                                            color: 'var(--color-given)',
+                                            fontWeight: 600,
+                                            fontSize: '1.5dvh',
+                                            cursor: 'pointer',
+                                        }}
+                                    >
+                                        No, keep it
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )
+            }
 
             {/* <p style={{ color: '#666', fontSize: 15 }}>Choose a difficulty to start</p> */}
 
@@ -175,9 +175,9 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                 style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(2, 1fr)',
-                    gap: 10,
+                    gap: '1dvh',
                     width: '100%',
-                    maxWidth: 360,
+                    objectFit: 'scale-down',
                 }}
             >
                 {DIFFICULTIES.map((d) => (
@@ -186,15 +186,15 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                         type="button"
                         onClick={() => onStart(d.id)}
                         style={{
-                            padding: '14px 8px',
-                            borderRadius: 10,
+                            padding: '1dvh 1dvh',
+                            borderRadius: '1dvh',
                             background: 'var(--color-surface)',
                             border: '1.5px solid var(--color-border)',
                             textAlign: 'left',
                             cursor: 'pointer',
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 2,
+                            gap: '1dvh',
                             transition: 'border-color 0.15s, background 0.15s',
                         }}
                         onMouseEnter={(e) => {
@@ -205,11 +205,11 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                         }}
                     >
                         <span
-                            style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-primary)' }}
+                            style={{ fontWeight: 600, fontSize: '2dvh', color: 'var(--color-primary)' }}
                         >
                             {d.name}
                         </span>
-                        <span style={{ fontSize: 12, color: '#888' }}>{d.description}</span>
+                        <span style={{ fontSize: '1.5dvh', color: '#888' }}>{d.description}</span>
                     </button>
                 ))}
             </div>
@@ -218,37 +218,36 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
             <div
                 style={{
                     width: '100%',
-                    maxWidth: 360,
                     background: 'var(--color-surface)',
                     border: '1.5px solid var(--color-border)',
-                    borderRadius: 12,
-                    padding: '16px',
+                    borderRadius: '2dvh',
+                    padding: '2dvh',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 12,
+                    gap: '1dvh',
                 }}
             >
                 <div>
-                    <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--color-primary)', margin: 0 }}>
+                    <p style={{ fontWeight: 700, fontSize: '2dvh', color: 'var(--color-primary)', margin: 0 }}>
                         Pen &amp; Paper
                     </p>
-                    <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>
+                    <p style={{ fontSize: '1.5dvh', color: '#888', margin: '4px 0 0' }}>
                         Sudoku like you would play it on paper — no hints, no highlights, no badge counters.
                     </p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1dvh' }}>
                     <select
                         aria-label="Pen & Paper difficulty"
                         value={penAndPaperDifficulty}
                         onChange={(e) => setPenAndPaperDifficulty(Number(e.target.value) as DifficultyId)}
                         style={{
                             flex: 1,
-                            padding: '8px 10px',
-                            borderRadius: 8,
+                            padding: '1dvh',
+                            borderRadius: '1dvh',
                             border: '1.5px solid var(--color-border)',
                             background: 'var(--color-bg)',
                             color: 'var(--color-primary)',
-                            fontSize: 14,
+                            fontSize: '2dvh',
                             fontWeight: 500,
                         }}
                     >
@@ -260,12 +259,12 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                         type="button"
                         onClick={() => onStart(penAndPaperDifficulty, 'pen-and-paper')}
                         style={{
-                            padding: '8px 18px',
-                            borderRadius: 8,
+                            padding: '1dvh 2dvh',
+                            borderRadius: '1dvh',
                             background: 'var(--color-bg)',
                             border: '1.5px solid var(--color-border)',
                             color: 'var(--color-primary)',
-                            fontSize: 14,
+                            fontSize: '2dvh',
                             fontWeight: 700,
                             cursor: 'pointer',
                             flexShrink: 0,
@@ -277,18 +276,18 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
             </div>
 
             {/* Secondary nav */}
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ display: 'flex', gap: '1dvh' }}>
                 {onStatistics && (
                     <button
                         type="button"
                         onClick={onStatistics}
                         style={{
-                            padding: '8px 20px',
-                            borderRadius: 8,
+                            padding: '1dvh 2dvh',
+                            borderRadius: '1dvh',
                             background: 'var(--color-btn-bg)',
                             border: 'none',
                             color: 'var(--color-given)',
-                            fontSize: 14,
+                            fontSize: '2dvh',
                             fontWeight: 600,
                             cursor: 'pointer',
                         }}
@@ -301,12 +300,12 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                         type="button"
                         onClick={onSettings}
                         style={{
-                            padding: '8px 20px',
-                            borderRadius: 8,
+                            padding: '1dvh 2dvh',
+                            borderRadius: '1dvh',
                             background: 'var(--color-btn-bg)',
                             border: 'none',
                             color: 'var(--color-given)',
-                            fontSize: 14,
+                            fontSize: '2dvh',
                             fontWeight: 600,
                             cursor: 'pointer',
                         }}
@@ -315,6 +314,6 @@ export function HomeScreen({ onStart, savedGame, onContinue, onDeleteSave, onSta
                     </button>
                 )}
             </div>
-        </main>
+        </main >
     );
 }
