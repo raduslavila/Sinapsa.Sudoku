@@ -11,10 +11,14 @@ import { StatisticsScreen } from './screens/StatisticsScreen.tsx';
 import { loadActiveGame, deleteActiveGame } from './storage/index.ts';
 import { getDifficultyConfig } from './config/difficulties.ts';
 import { App as CapApp } from '@capacitor/app';
+import { useViewportCssVars } from './hooks/useViewportCssVars';
+import { AppShell } from './layout/AppShell';
 
 type IdleScreen = 'home' | 'settings' | 'statistics';
 
 export default function App() {
+  useViewportCssVars();
+  
   const game = useGameStore((s) => s.game);
   const startGame = useGameStore((s) => s.startGame);
   const continueGame = useGameStore((s) => s.continueGame);
@@ -135,43 +139,51 @@ export default function App() {
     startGame(id, gameMode);
   };
 
-  if (game.status !== 'idle') {
+  const mainScreen = (() => {
+    if (game.status !== 'idle') {
+      return (
+        <GameScreen
+          game={game}
+          onSelectCell={selectCell}
+          onDigitInput={(d: Digit) => handleDigitInput(d)}
+          onClear={clearCell}
+          onUndo={undo}
+          onHintSelect={hintCell}
+          onHintApply={applyHint}
+          onToggleNotes={() => setNotesMode(!game.notesMode)}
+          onPause={pause}
+          onResume={resume}
+          onHome={goHome}
+          onNewGame={handleNewGameFromCurrent}
+          onSubmitSolution={submitSolution}
+          onGiveUp={() => { void giveUp(); }}
+        />
+      );
+    }
+
+    if (idleScreen === 'settings') {
+      return <SettingsScreen onBack={() => setIdleScreen('home')} />;
+    }
+
+    if (idleScreen === 'statistics') {
+      return <StatisticsScreen onBack={() => setIdleScreen('home')} />;
+    }
+
     return (
-      <GameScreen
-        game={game}
-        onSelectCell={selectCell}
-        onDigitInput={(d: Digit) => handleDigitInput(d)}
-        onClear={clearCell}
-        onUndo={undo}
-        onHintSelect={hintCell}
-        onHintApply={applyHint}
-        onToggleNotes={() => setNotesMode(!game.notesMode)}
-        onPause={pause}
-        onResume={resume}
-        onHome={goHome}
-        onNewGame={handleNewGameFromCurrent}
-        onSubmitSolution={submitSolution}
-        onGiveUp={() => { void giveUp(); }}
+      <HomeScreen
+        onStart={handleStart}
+        savedGame={savedGameSummary}
+        onContinue={handleContinue}
+        onDeleteSave={handleDeleteSave}
+        onStatistics={() => setIdleScreen('statistics')}
+        onSettings={() => setIdleScreen('settings')}
       />
     );
-  }
-
-  if (idleScreen === 'settings') {
-    return <SettingsScreen onBack={() => setIdleScreen('home')} />;
-  }
-
-  if (idleScreen === 'statistics') {
-    return <StatisticsScreen onBack={() => setIdleScreen('home')} />;
-  }
+  })();
 
   return (
-    <HomeScreen
-      onStart={handleStart}
-      savedGame={savedGameSummary}
-      onContinue={handleContinue}
-      onDeleteSave={handleDeleteSave}
-      onStatistics={() => setIdleScreen('statistics')}
-      onSettings={() => setIdleScreen('settings')}
-    />
+    <AppShell>
+      {mainScreen}
+    </AppShell>
   );
 }

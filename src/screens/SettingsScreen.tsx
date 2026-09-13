@@ -204,17 +204,18 @@ export function SettingsScreen({ onBack }: Props) {
     const setDisableNumberPadBadge = useSettingsStore((s) => s.setDisableNumberPadBadge);
 
     return (
-        <main
-            style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                padding: '16px 16px 32px',
-                gap: 24,
-                overflowY: 'auto',
-            }}
-        >
+        <div className="screen-scroll">
+            <main
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    flex: 1,
+                    paddingTop: '2dvh',
+                    gap: '5dvh',
+                    paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+                }}
+            >
             {/* Header */}
             <div
                 style={{
@@ -389,5 +390,6 @@ export function SettingsScreen({ onBack }: Props) {
                 </label>
             </section>
         </main >
+        </div>
     );
 }

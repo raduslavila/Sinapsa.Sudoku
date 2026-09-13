@@ -124,16 +124,18 @@ export function GameScreen({
     };
 
     return (
-        <main
-            style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                padding: '2dvh 1dvh 0',
-                width: '100%',
-            }}
-        >
+        <div className="screen-scroll">
+            <main
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    flex: 1,
+                    paddingTop: '2dvh',
+                    width: '100%',
+                    paddingBottom: 'env(safe-area-inset-bottom, 8px)',
+                }}
+            >
             <div
                 style={{
                     display: 'flex',
@@ -532,5 +534,6 @@ export function GameScreen({
                 </div>
             )}
         </main>
+        </div>
     );
 }
