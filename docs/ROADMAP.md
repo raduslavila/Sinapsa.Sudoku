@@ -136,25 +136,14 @@ Fallback for the browser/web build: no-op — the adapter must guard with `Capac
 - Do not show a custom "Enjoying the app?" pre-prompt — Google Play policy prohibits steering users toward positive reviews.
 - Day 7 retention is a primary ranking signal; triggering after the 3rd win targets players who have already demonstrated engagement and are most likely to leave a positive review.
 
-## Milestone 8 — Play Games bridge stub
+## ✅ Milestone 7.3 — Closed-beta rating feedback
 
-- Define TypeScript adapter.
-- Create Kotlin Capacitor plugin skeleton.
-- Add no-op/mock web implementation.
-- Add sync manager tests.
+- ✅ Added a `Rate Your App` action in Settings that opens the Play Store listing.
+- ✅ Added neutral feedback copy in Settings and after a completed puzzle.
+- ✅ Kept the official Android In-App Review request separate from the manual link.
+- ✅ The native request remains after the third cumulative win, once per install, and is controlled by Google Play.
+- ✅ Browser builds use a new tab for the public listing and never invoke the native review API.
 
-## Milestone 9 — Google Play Games implementation
+## Milestone 8 — Open Testing
 
-- Sign-in.
-- Save snapshot.
-- Load snapshot.
-- Conflict resolution.
-- Manual restore.
-
-## Milestone 10 — Polish
-
-- Accessibility.
-- Keyboard navigation.
-- Responsive layout.
-- E2E tests.
-- PWA manifest.
+- [ ] Finish Closed Testing period

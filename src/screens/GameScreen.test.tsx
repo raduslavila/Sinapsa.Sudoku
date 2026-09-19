@@ -6,10 +6,11 @@ import type { GameState } from '../state/gameState.ts';
 import type { Puzzle } from '../engine/types.ts';
 import { EASY_PUZZLE, SOLVED_GRID } from '../test/fixtures.ts';
 import { GameScreen } from './GameScreen.tsx';
-import { maybePromptForRating } from '../state/ratingService.ts';
+import { maybePromptForRating, openPlayStoreListing } from '../state/ratingService.ts';
 
 vi.mock('../state/ratingService.ts', () => ({
     maybePromptForRating: vi.fn(),
+    openPlayStoreListing: vi.fn(),
 }));
 
 function makePuzzle(): Puzzle {
@@ -80,6 +81,29 @@ describe('GameScreen completion popup rating boundary', () => {
             mistakeCount: 0,
             hintsUsed: 0,
         });
+    });
+
+    it('shows a neutral feedback notice and opens the manual rating link', () => {
+        render(
+            <GameScreen
+                game={makeWonGameState()}
+                onSelectCell={vi.fn()}
+                onDigitInput={vi.fn()}
+                onClear={vi.fn()}
+                onUndo={vi.fn()}
+                onHintSelect={vi.fn()}
+                onHintApply={vi.fn()}
+                onToggleNotes={vi.fn()}
+                onPause={vi.fn()}
+                onResume={vi.fn()}
+                onHome={vi.fn()}
+                onNewGame={vi.fn()}
+            />,
+        );
+
+        expect(screen.getByText(/Your feedback helps us improve the game/)).toBeTruthy();
+        fireEvent.click(screen.getByRole('button', { name: 'Rate Your App' }));
+        expect(openPlayStoreListing).toHaveBeenCalledTimes(1);
     });
 
     it('does not request rating during normal gameplay UI interactions', () => {

@@ -17,6 +17,8 @@ A production-quality, offline-first Sudoku app built with React, TypeScript, and
 - **Statistics** — games played, win rate, best time and average time per difficulty
 - **Dark mode** — Light / Dark / System theme via CSS custom properties
 - **Offline-first** — all data stored locally in IndexedDB, no account required
+- **Rating feedback** — users can open the Play Store listing from Settings or after completing a puzzle
+- **Neutral in-app review timing** — Android may request the official Google Play review dialog after the third win; Google controls whether it appears
 - **Android-ready** — Capacitor wrapper included; Google Play Games integration planned
 
 ---
@@ -216,6 +218,7 @@ Google Play Games integration (sign-in, cloud save snapshots, achievements, lead
 - [x] M5 — IndexedDB persistence (auto-save, continue game)
 - [x] M6 — Statistics, settings, dark mode, configurable limits
 - [X] M7 — Android packaging and Play Store preparation
+- [x] M7.2 — Play Store rating link, neutral feedback notice, and Android In-App Review timing
 - [ ] M8 — Google Play Games bridge stub (Kotlin Capacitor plugin)
 - [ ] M9 — Google Play Games implementation (sign-in, snapshots, achievements)
 - [ ] M10 — Accessibility, E2E tests, PWA manifest, polish
