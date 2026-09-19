@@ -144,9 +144,6 @@ Fallback for the browser/web build: no-op — the adapter must guard with `Capac
 - ✅ The native request remains after the third cumulative win, once per install, and is controlled by Google Play.
 - ✅ Browser builds use a new tab for the public listing and never invoke the native review API.
 
-## Milestone 8 — Play Games bridge stub
+## Milestone 8 — Open Testing
 
-- Define TypeScript adapter.
-- Create Kotlin Capacitor plugin skeleton.
-- Add no-op/mock web implementation.
-- Add sync manager tests.
+- [ ] Finish Closed Testing period
