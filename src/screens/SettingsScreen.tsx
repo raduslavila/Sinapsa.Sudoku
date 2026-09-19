@@ -3,6 +3,7 @@ import type { Theme, PaletteId, PaletteEntry } from '../state/settingsStore.ts';
 import { PALETTES } from '../state/settingsStore.ts';
 import { DIFFICULTIES } from '../config/difficulties.ts';
 import type { DifficultyId } from '../engine/types.ts';
+import { openPlayStoreListing } from '../state/ratingService.ts';
 
 interface Props {
     onBack: () => void;
@@ -216,180 +217,218 @@ export function SettingsScreen({ onBack }: Props) {
                     paddingBottom: 'env(safe-area-inset-bottom, 16px)',
                 }}
             >
-            {/* Header */}
-            <div
-                style={{
-                    width: '100%',
-                    maxWidth: 400,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                }}
-            >
-                <button
-                    type="button"
-                    onClick={onBack}
-                    aria-label="Back"
-                    style={{
-                        fontSize: 14,
-                        color: 'var(--color-primary)',
-                        fontWeight: 600,
-                        padding: '4px 8px',
-                    }}
-                >
-                    ← Back
-                </button>
-                <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-given)' }}>
-                    Settings
-                </h2>
-            </div>
-
-            {/* Color Palette */}
-            <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>Color Palette</h3>
-                <div style={{ display: 'flex', gap: 2 }}>
-                    {PALETTES.map((entry) => (
-                        <PaletteSwatch
-                            key={entry.id}
-                            entry={entry}
-                            current={palette}
-                            onSelect={setPalette}
-                        />
-                    ))}
-                </div>
-            </section>
-
-            {/* Theme */}
-            <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>Theme</h3>
-                <div style={{ display: 'flex', gap: 8 }}>
-                    <ThemeButton label="Light" value="light" current={theme} onSelect={setTheme} />
-                    <ThemeButton label="Dark" value="dark" current={theme} onSelect={setTheme} />
-                    <ThemeButton label="System" value="system" current={theme} onSelect={setTheme} />
-                </div>
-            </section>
-
-            {/* Limits table */}
-            <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>
-                    Limits per difficulty
-                </h3>
-                <p style={{ fontSize: 12, color: '#888' }}>
-                    Mistakes: max wrong placements per game (empty = unlimited).
-                    Hints: max hints per game (empty = unlimited).
-                </p>
-
-                {/* Column headers */}
+                {/* Header */}
                 <div
                     style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 80px 80px',
-                        gap: 8,
-                        padding: '0 4px',
+                        width: '100%',
+                        maxWidth: 400,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
                     }}
                 >
-                    <span style={{ fontSize: 12, color: '#888' }}>Difficulty</span>
-                    <span style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>Mistakes</span>
-                    <span style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>Hints</span>
+                    <button
+                        type="button"
+                        onClick={onBack}
+                        aria-label="Back"
+                        style={{
+                            fontSize: 14,
+                            color: 'var(--color-primary)',
+                            fontWeight: 600,
+                            padding: '4px 8px',
+                        }}
+                    >
+                        ← Back
+                    </button>
+                    <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-given)' }}>
+                        Settings
+                    </h2>
                 </div>
 
-                {DIFFICULTIES.map((d) => {
-                    const mistakeVal = mistakeLimitOverrides[d.id as DifficultyId];
-                    const hintVal = hintLimitOverrides[d.id as DifficultyId];
-                    return (
-                        <div
-                            key={d.id}
+                {/* Color Palette */}
+                <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>Color Palette</h3>
+                    <div style={{ display: 'flex', gap: 2 }}>
+                        {PALETTES.map((entry) => (
+                            <PaletteSwatch
+                                key={entry.id}
+                                entry={entry}
+                                current={palette}
+                                onSelect={setPalette}
+                            />
+                        ))}
+                    </div>
+                </section>
+
+                {/* Theme */}
+                <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>Theme</h3>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                        <ThemeButton label="Light" value="light" current={theme} onSelect={setTheme} />
+                        <ThemeButton label="Dark" value="dark" current={theme} onSelect={setTheme} />
+                        <ThemeButton label="System" value="system" current={theme} onSelect={setTheme} />
+                    </div>
+                </section>
+
+                {/* Limits table */}
+                <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>
+                        Limits per difficulty
+                    </h3>
+                    <p style={{ fontSize: 12, color: '#888' }}>
+                        Mistakes: max wrong placements per game (empty = unlimited).
+                        Hints: max hints per game (empty = unlimited).
+                    </p>
+
+                    {/* Column headers */}
+                    <div
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 80px 80px',
+                            gap: 8,
+                            padding: '0 4px',
+                        }}
+                    >
+                        <span style={{ fontSize: 12, color: '#888' }}>Difficulty</span>
+                        <span style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>Mistakes</span>
+                        <span style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>Hints</span>
+                    </div>
+
+                    {DIFFICULTIES.map((d) => {
+                        const mistakeVal = mistakeLimitOverrides[d.id as DifficultyId];
+                        const hintVal = hintLimitOverrides[d.id as DifficultyId];
+                        return (
+                            <div
+                                key={d.id}
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: '1fr 80px 80px',
+                                    gap: 8,
+                                    alignItems: 'center',
+                                    padding: '8px',
+                                    background: 'var(--color-surface)',
+                                    borderRadius: 8,
+                                    border: '1px solid var(--color-border)',
+                                }}
+                            >
+                                <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-given)' }}>
+                                    {d.name}
+                                </span>
+                                <LimitInput
+                                    value={mistakeVal}
+                                    defaultValue={d.defaultMistakeLimit}
+                                    minimumValue={1}
+                                    onChange={(v) => setMistakeLimit(d.id as DifficultyId, v)}
+                                    placeholder={d.defaultMistakeLimit === null ? '∞' : String(d.defaultMistakeLimit)}
+                                />
+                                <LimitInput
+                                    value={hintVal}
+                                    defaultValue={d.defaultHintLimit}
+                                    minimumValue={0}
+                                    onChange={(v) => setHintLimit(d.id as DifficultyId, v)}
+                                    placeholder={d.defaultHintLimit === null ? '∞' : String(d.defaultHintLimit)}
+                                />
+                            </div>
+                        );
+                    })}
+                </section>
+
+                {/* Feedback */}
+                <section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>
+                        Feedback
+                    </h3>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 10,
+                            padding: '14px',
+                            background: 'var(--color-surface)',
+                            borderRadius: 10,
+                            border: '1px solid var(--color-border)',
+                        }}
+                    >
+                        <p style={{ margin: 0, fontSize: 13, lineHeight: 1.45, color: 'var(--color-given)' }}>
+                            Your feedback helps us improve Sudoku and make the game better for everyone.
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => { void openPlayStoreListing(); }}
                             style={{
-                                display: 'grid',
-                                gridTemplateColumns: '1fr 80px 80px',
-                                gap: 8,
-                                alignItems: 'center',
-                                padding: '8px',
-                                background: 'var(--color-surface)',
-                                borderRadius: 8,
-                                border: '1px solid var(--color-border)',
+                                padding: '11px 14px',
+                                borderRadius: 9,
+                                border: '1.5px solid var(--color-primary)',
+                                background: 'var(--color-primary)',
+                                color: '#fff',
+                                fontSize: 14,
+                                fontWeight: 700,
+                                cursor: 'pointer',
                             }}
                         >
-                            <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-given)' }}>
-                                {d.name}
-                            </span>
-                            <LimitInput
-                                value={mistakeVal}
-                                defaultValue={d.defaultMistakeLimit}
-                                minimumValue={1}
-                                onChange={(v) => setMistakeLimit(d.id as DifficultyId, v)}
-                                placeholder={d.defaultMistakeLimit === null ? '∞' : String(d.defaultMistakeLimit)}
-                            />
-                            <LimitInput
-                                value={hintVal}
-                                defaultValue={d.defaultHintLimit}
-                                minimumValue={0}
-                                onChange={(v) => setHintLimit(d.id as DifficultyId, v)}
-                                placeholder={d.defaultHintLimit === null ? '∞' : String(d.defaultHintLimit)}
-                            />
-                        </div>
-                    );
-                })}
-            </section>
+                            Rate Your App
+                        </button>
+                    </div>
+                </section>
 
-            < section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>
-                    Advanced settings
-                </h3>
-                <label
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: 12,
-                        padding: '12px 14px',
-                        background: 'var(--color-surface)',
-                        borderRadius: 10,
-                        border: '1px solid var(--color-border)',
-                        color: 'var(--color-given)',
-                    }}
-                >
-                    <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>Disable number pad counter</span>
-                        <span style={{ fontSize: 12, color: '#888' }}>
-                            Disable number pad badge counter and functionality.
+                < section style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-given)' }}>
+                        Advanced settings
+                    </h3>
+                    <label
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: 12,
+                            padding: '12px 14px',
+                            background: 'var(--color-surface)',
+                            borderRadius: 10,
+                            border: '1px solid var(--color-border)',
+                            color: 'var(--color-given)',
+                        }}
+                    >
+                        <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <span style={{ fontSize: 14, fontWeight: 600 }}>Disable number pad counter</span>
+                            <span style={{ fontSize: 12, color: '#888' }}>
+                                Disable number pad badge counter and functionality.
+                            </span>
                         </span>
-                    </span>
-                    <input
-                        type="checkbox"
-                        checked={disableNumberPadBadge}
-                        onChange={(e) => setDisableNumberPadBadge(e.target.checked)}
-                        aria-label="Disable number pad badge"
-                    />
-                </label>
-                <label
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: 12,
-                        padding: '12px 14px',
-                        background: 'var(--color-surface)',
-                        borderRadius: 10,
-                        border: '1px solid var(--color-border)',
-                        color: 'var(--color-given)',
-                    }}
-                >
-                    <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>Highlight wrong notes</span>
-                        <span style={{ fontSize: 12, color: '#888' }}>
-                            Colors note digits red when they conflict with placed values.
+                        <input
+                            type="checkbox"
+                            checked={disableNumberPadBadge}
+                            onChange={(e) => setDisableNumberPadBadge(e.target.checked)}
+                            aria-label="Disable number pad badge"
+                        />
+                    </label>
+                    <label
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: 12,
+                            padding: '12px 14px',
+                            background: 'var(--color-surface)',
+                            borderRadius: 10,
+                            border: '1px solid var(--color-border)',
+                            color: 'var(--color-given)',
+                        }}
+                    >
+                        <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <span style={{ fontSize: 14, fontWeight: 600 }}>Highlight wrong notes</span>
+                            <span style={{ fontSize: 12, color: '#888' }}>
+                                Colors note digits red when they conflict with placed values.
+                            </span>
                         </span>
-                    </span>
-                    <input
-                        type="checkbox"
-                        checked={showWrongNoteConflicts}
-                        onChange={(e) => setShowWrongNoteConflicts(e.target.checked)}
-                        aria-label="Highlight wrong notes"
-                    />
-                </label>
-            </section>
-        </main >
+                        <input
+                            type="checkbox"
+                            checked={showWrongNoteConflicts}
+                            onChange={(e) => setShowWrongNoteConflicts(e.target.checked)}
+                            aria-label="Highlight wrong notes"
+                        />
+                    </label>
+                </section>
+            </main >
         </div>
     );
 }

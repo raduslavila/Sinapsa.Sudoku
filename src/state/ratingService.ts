@@ -1,10 +1,24 @@
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import { InAppReview } from '@capacitor-community/in-app-review';
 import { loadCompletedGames } from '../storage/index.ts';
 import type { DifficultyId } from '../engine/types.ts';
 import { useSettingsStore } from './settingsStore.ts';
 
 export const RATING_PROMPT_WIN_THRESHOLD = 3;
+export const PLAY_STORE_LISTING_URL = 'https://play.google.com/store/apps/details?id=ro.slavila.sudokuapp&showAllReviews=true';
+
+/** Open the public Play Store listing without changing the app's rating state. */
+export async function openPlayStoreListing(): Promise<void> {
+    if (Capacitor.isNativePlatform()) {
+        await Browser.open({ url: PLAY_STORE_LISTING_URL });
+        return;
+    }
+
+    if (typeof window !== 'undefined') {
+        window.open(PLAY_STORE_LISTING_URL, '_blank', 'noopener,noreferrer');
+    }
+}
 
 export interface CurrentWinSummary {
     readonly seed: string;
